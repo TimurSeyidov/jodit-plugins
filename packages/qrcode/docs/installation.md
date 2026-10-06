@@ -40,22 +40,22 @@ The browser build is a single file that already contains the qrcode library. Loa
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js"></script>
 ```
 
 === "jsDelivr"
 
     ```text
-    https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js
+    https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js
     ```
 
 === "unpkg"
 
     ```text
-    https://unpkg.com/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js
+    https://unpkg.com/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js
     ```
 
-`@0` takes the latest 0.x version; pin an exact one in production, for example `jodit-plugin-qrcode@0.1.0`. A non-minified `qrcode.js` is next to `qrcode.min.js`.
+`@1` takes the latest 1.x version; pin an exact one in production, for example `jodit-plugin-qrcode@1.0.0`. A non-minified `qrcode.js` is next to `qrcode.min.js`.
 
 ### Builds
 
@@ -78,7 +78,7 @@ Jodit.make('#editor', {
 	extraPlugins: [
 		{
 			name: 'qrcode',
-			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js'
+			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js'
 		}
 	]
 });

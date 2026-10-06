@@ -88,7 +88,7 @@ The build, the navigation and the demo scripts pick the new package up automatic
 Each package is released on its own. Bump the version in `packages/<name>/package.json`, commit, then tag and push:
 
 ```shell
-git tag <name>-v<version>      # for example qrcode-v0.2.0
+git tag <name>-v<version>      # for example qrcode-v1.1.0
 git push origin <name>-v<version>
 ```
 

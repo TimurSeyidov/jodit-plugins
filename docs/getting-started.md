@@ -44,7 +44,7 @@ Load the plugin after Jodit:
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js"></script>
 
 <textarea id="editor"></textarea>
 <script>
@@ -52,7 +52,7 @@ Load the plugin after Jodit:
 </script>
 ```
 
-The same file is available from unpkg: `https://unpkg.com/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js`. Pin an exact version in production, for example `jodit-plugin-qrcode@0.1.0`.
+The same file is available from unpkg: `https://unpkg.com/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js`. Pin an exact version in production, for example `jodit-plugin-qrcode@1.0.0`.
 
 ### Builds
 
@@ -75,7 +75,7 @@ Jodit.make('#editor', {
 	extraPlugins: [
 		{
 			name: 'qrcode',
-			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@0/dist/es2021/plugins/qrcode/qrcode.min.js'
+			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-qrcode@1/dist/es2021/plugins/qrcode/qrcode.min.js'
 		}
 	]
 });

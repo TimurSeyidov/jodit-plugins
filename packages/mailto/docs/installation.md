@@ -40,22 +40,22 @@ The browser build is a single file. Load it after Jodit, from the same build fol
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jodit@4/es2021/jodit.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@0/dist/es2021/plugins/mailto/mailto.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@1/dist/es2021/plugins/mailto/mailto.min.js"></script>
 ```
 
 === "jsDelivr"
 
     ```text
-    https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@0/dist/es2021/plugins/mailto/mailto.min.js
+    https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@1/dist/es2021/plugins/mailto/mailto.min.js
     ```
 
 === "unpkg"
 
     ```text
-    https://unpkg.com/jodit-plugin-mailto@0/dist/es2021/plugins/mailto/mailto.min.js
+    https://unpkg.com/jodit-plugin-mailto@1/dist/es2021/plugins/mailto/mailto.min.js
     ```
 
-`@0` takes the latest 0.x version; pin an exact one in production, for example `jodit-plugin-mailto@0.1.0`. A non-minified `mailto.js` is next to `mailto.min.js`.
+`@1` takes the latest 1.x version; pin an exact one in production, for example `jodit-plugin-mailto@1.0.0`. A non-minified `mailto.js` is next to `mailto.min.js`.
 
 ### Builds
 
@@ -78,7 +78,7 @@ Jodit.make('#editor', {
 	extraPlugins: [
 		{
 			name: 'mailto',
-			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@0/dist/es2021/plugins/mailto/mailto.min.js'
+			url: 'https://cdn.jsdelivr.net/npm/jodit-plugin-mailto@1/dist/es2021/plugins/mailto/mailto.min.js'
 		}
 	]
 });

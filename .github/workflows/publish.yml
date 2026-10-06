@@ -1,7 +1,7 @@
 name: Publish
 
 # Publish one package to npm when its tag is pushed: `<dir>-v<version>`, for
-# example `qrcode-v0.2.0` for packages/qrcode. Uses npm trusted publishing
+# example `qrcode-v1.1.0` for packages/qrcode. Uses npm trusted publishing
 # (OIDC): no token, provenance is attached automatically. The trusted
 # publisher (this repository + publish.yml) is configured in each package's
 # settings on npmjs.com.
