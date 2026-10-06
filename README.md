@@ -12,6 +12,10 @@ Plugins for the [Jodit](https://xdsoft.net/jodit/) editor. Each plugin is a sepa
 | Email link | [`jodit-plugin-mailto`](packages/mailto) | [![npm](https://img.shields.io/npm/v/jodit-plugin-mailto)](https://www.npmjs.com/package/jodit-plugin-mailto) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/) |
 | QR code | [`jodit-plugin-qrcode`](packages/qrcode) | [![npm](https://img.shields.io/npm/v/jodit-plugin-qrcode)](https://www.npmjs.com/package/jodit-plugin-qrcode) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/) |
 
+| QR code | Email link |
+| --- | --- |
+| ![Inserting and editing a QR code in Jodit](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/media/qrcode.gif) | ![Inserting an email link with the short form and the "Additional" tab](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/media/mailto.gif) |
+
 ## Development
 
 Requirements: Node.js 22, Python 3.10+ for the documentation.
@@ -31,6 +35,7 @@ npm run test:unit    # unit tests (Vitest)
 npm run test:types   # build packages and compile tests/types against their declarations
 npm run test:e2e     # build packages and run the browser tests (Playwright)
 npm run test:coverage  # both with coverage, into coverage/unit and coverage/e2e
+npm run gifs         # build packages and record packages/*/docs/media/*.gif (needs ffmpeg)
 ```
 
 The browser tests need Chromium: `npx playwright install chromium` once, or run them in the installed Google Chrome with `PLAYWRIGHT_CHANNEL=chrome npm run test:e2e`.
@@ -60,6 +65,7 @@ tests/types/           a TypeScript consumer of the published declarations
 tools/build.mjs        builds every package with esbuild and tsc
 tools/mkdocs_hooks.py  adds packages/*/docs and the built plugins to the site
 tools/serve.mjs        static server for the browser tests
+tools/record-gifs.mjs  records the animated demos of the plugins
 ```
 
 Every package builds into:

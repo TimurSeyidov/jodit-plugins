@@ -9,6 +9,8 @@
 
 Email links for the [Jodit](https://xdsoft.net/jodit/) editor: a toolbar button that inserts `mailto:` links. The dialog has a short form (To, Subject, link text) and an "Additional" tab with every field: To, Cc, Bcc, Subject, Body and the link text. Required fields are configurable, addresses are checked, and existing links can be edited or removed. No dependencies.
 
+![Inserting an email link with the short form and the "Additional" tab](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/media/mailto.gif)
+
 **[Documentation and live demo](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/)**
 
 ## Install

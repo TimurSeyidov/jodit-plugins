@@ -9,6 +9,8 @@
 
 QR codes for the [Jodit](https://xdsoft.net/jodit/) editor: a toolbar button that turns any text or link into a QR code image, with a live preview and editing of inserted codes. The image is generated in the browser, no server needed.
 
+![Inserting and editing a QR code in Jodit](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/media/qrcode.gif)
+
 **[Documentation and live demo](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/)**
 
 ## Install

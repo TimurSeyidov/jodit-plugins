@@ -6,6 +6,8 @@
 
 `jodit-plugin-qrcode` adds a toolbar button that turns any text or link into a QR code and inserts it as an image.
 
+![Inserting and editing a QR code in Jodit](media/qrcode.gif)
+
 - **Live preview**: the code is redrawn while you type.
 - **Selection as input**: select a link in the text and press the button, the dialog opens with it; the text stays and the code is inserted right after it.
 - **Editing**: double-click an inserted code, or click it and press the button, to change its text; the image is updated in place and keeps its size.

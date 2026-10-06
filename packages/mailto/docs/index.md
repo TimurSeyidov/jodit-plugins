@@ -6,6 +6,8 @@
 
 `jodit-plugin-mailto` adds a toolbar button that inserts `mailto:` links. A click on such a link opens a new message in the reader's mail app with the recipients, subject and text already filled in.
 
+![Inserting an email link with the short form and the "Additional" tab](media/mailto.gif)
+
 - **Every field of a mailto link**: To, Cc, Bcc, Subject and Body, plus the link text.
 - **Two tabs**: "Main" is the short form with To, Subject and the link text; "Additional" is the full form with every field (To, Cc, Bcc, Subject, Body, link text). Fields on both tabs share their values. Any field can be moved to the short form or hidden.
 - **Required and optional fields**: only To is required by default; any field can be made required with the [options](options.md). If a field with an error is on the other tab, the dialog switches to it.
