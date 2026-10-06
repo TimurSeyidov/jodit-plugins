@@ -44,6 +44,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           use_oidc: true
+          disable_search: true # upload this file only, under its flag
           files: coverage/unit/lcov.info
           flags: unit
           fail_ci_if_error: false
@@ -52,6 +53,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           use_oidc: true
+          disable_search: true
           files: coverage/e2e/lcov.info
           flags: e2e
           fail_ci_if_error: false
