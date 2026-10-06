@@ -27,6 +27,15 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck
+
+      # The version in package.json must have its CHANGELOG section, so the
+      # release tag can be pushed as soon as the version is bumped
+      - name: CHANGELOG covers the package versions
+        run: |
+          for dir in packages/*/; do
+            dir="$(basename "$dir")"
+            node tools/changelog.mjs "$dir" "$(node -p "require('./packages/$dir/package.json').version")" > /dev/null
+          done
       - run: npm run build
 
       # The published declarations, compiled as a project that installs the

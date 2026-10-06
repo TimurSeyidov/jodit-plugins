@@ -4,7 +4,8 @@ name: Publish
 # example `qrcode-v1.1.0` for packages/qrcode. Uses npm trusted publishing
 # (OIDC): no token, provenance is attached automatically. The trusted
 # publisher (this repository + publish.yml) is configured in each package's
-# settings on npmjs.com.
+# settings on npmjs.com. Then a GitHub release is made for the tag, with the
+# section of the version from packages/<dir>/CHANGELOG.md as its notes.
 
 on:
   push:
@@ -12,7 +13,7 @@ on:
       - '*-v*'
 
 permissions:
-  contents: read
+  contents: write # the GitHub release
   id-token: write # trusted publishing and provenance
 
 jobs:
@@ -48,6 +49,11 @@ jobs:
             exit 1
           fi
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Before anything is published: the release needs its notes
+      - name: CHANGELOG has a section for the version
+        run: node tools/changelog.mjs ${{ steps.pkg.outputs.dir }} ${{ steps.pkg.outputs.version }}
 
       - run: npm run typecheck
       - run: npm run build
@@ -68,3 +74,23 @@ jobs:
           else
             npm publish --access public
           fi
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIR: ${{ steps.pkg.outputs.dir }}
+          VERSION: ${{ steps.pkg.outputs.version }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME exists, nothing to do"
+            exit 0
+          fi
+          name="$(node -p "require('./packages/$DIR/package.json').name")"
+          {
+            node tools/changelog.mjs "$DIR" "$VERSION"
+            echo
+            echo "---"
+            echo
+            echo "npm: [$name@$VERSION](https://www.npmjs.com/package/$name/v/$VERSION) · [Changelog](https://github.com/$GITHUB_REPOSITORY/blob/main/packages/$DIR/CHANGELOG.md) · [Docs](https://timurseyidov.github.io/jodit-plugins/plugins/$DIR/)"
+          } > notes.md
+          gh release create "$GITHUB_REF_NAME" --title "$name $VERSION" --notes-file notes.md --verify-tag

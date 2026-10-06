@@ -52,6 +52,10 @@ Loading through the Jodit `extraPlugins` option is supported too; see [Installat
 
 Details: [Options](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/options/).
 
+## Changelog
+
+See [CHANGELOG.md](https://github.com/TimurSeyidov/jodit-plugins/blob/main/packages/mailto/CHANGELOG.md) or the [releases](https://github.com/TimurSeyidov/jodit-plugins/releases).
+
 ## License
 
 [MIT](https://github.com/TimurSeyidov/jodit-plugins/blob/main/LICENSE)

@@ -5,7 +5,8 @@ For each ``packages/<dir>/`` with a ``docs/`` folder:
 * ``docs/**`` is served under ``plugins/<name>/`` and listed in the
   navigation under "Plugins", with ``index.md`` first and the pages from
   ``docs.order`` in its ``package.json`` next;
-* the "Edit" button of these pages points to ``packages/<dir>/docs/``;
+* ``CHANGELOG.md`` of the package becomes the last page, "Changelog";
+* the "Edit" button of these pages points to their file in ``packages/<dir>/``;
 * the ES2021 browser bundle ``dist/es2021/plugins/<name>/<name>.min.js`` is served under
   ``assets/plugins/`` and loaded on every page, after Jodit itself.
 
@@ -60,6 +61,8 @@ def on_config(config):
             for p in docs.rglob("*.md")
             if p.relative_to(docs).as_posix() not in pages
         )
+        if (pkg_dir / "CHANGELOG.md").is_file():
+            pages.append("changelog.md")
         plugins_nav.append(
             {_title(docs / "index.md"): [f"plugins/{name}/{p}" for p in pages]}
         )
@@ -94,6 +97,12 @@ def on_files(files, config):
                 uri = f"plugins/{name}/{path.relative_to(docs).as_posix()}"
                 _sources[uri] = path.relative_to(ROOT).as_posix()
                 add(uri, path)
+
+        changelog = pkg_dir / "CHANGELOG.md"
+        if changelog.is_file():
+            uri = f"plugins/{name}/changelog.md"
+            _sources[uri] = changelog.relative_to(ROOT).as_posix()
+            add(uri, changelog)
 
         bundle = f"{name}.min.js"
         add(

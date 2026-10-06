@@ -94,14 +94,19 @@ The build, the navigation and the demo scripts pick the new package up automatic
 
 ## Releases
 
-Each package is released on its own. Bump the version in `packages/<name>/package.json`, commit, then tag and push:
+Each package is released on its own, with a tag `<dir>-v<version>`:
 
-```shell
-git tag <name>-v<version>      # for example qrcode-v1.1.0
-git push origin <name>-v<version>
-```
+1. Describe the changes under `## [Unreleased]` in `packages/<dir>/CHANGELOG.md` while working on them.
+2. For the release, rename that section to `## [<version>] - <date>`, add an empty `## [Unreleased]` above it and update the compare links at the bottom.
+3. Set the same version in `packages/<dir>/package.json`, run `npm install --package-lock-only`, commit and push; wait for CI.
+4. Tag and push:
 
-The `Publish` workflow builds the package and publishes it to npm with provenance (npm trusted publishing). The first version of a new package is published by hand with `npm publish -w packages/<name>`, then the trusted publisher (this repository, `publish.yml`) is added in the package settings on npmjs.com.
+    ```shell
+    git tag <dir>-v<version>      # for example qrcode-v1.1.0
+    git push origin <dir>-v<version>
+    ```
+
+The `Publish` workflow checks that the tag matches `package.json` and that the CHANGELOG has a section for the version, runs the tests, publishes the package to npm with provenance (npm trusted publishing) and makes a GitHub release with that section as its notes.
 
 ## License
 

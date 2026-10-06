@@ -56,6 +56,10 @@ The browser build already contains the qrcode library. Loading through the Jodit
 
 Details: [Options](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/options/).
 
+## Changelog
+
+See [CHANGELOG.md](https://github.com/TimurSeyidov/jodit-plugins/blob/main/packages/qrcode/CHANGELOG.md) or the [releases](https://github.com/TimurSeyidov/jodit-plugins/releases).
+
 ## License
 
 [MIT](https://github.com/TimurSeyidov/jodit-plugins/blob/main/LICENSE)
