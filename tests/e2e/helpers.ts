@@ -10,6 +10,14 @@ declare global {
 
 		/** Scratch value for tests that compare state across steps */
 		saved?: unknown[];
+
+		/** Exports of the bundled application of esm.spec.ts */
+		app: {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			Jodit: any;
+			registerQrCode(Jodit: unknown): void;
+			registerMailto(Jodit: unknown): void;
+		};
 	}
 }
 

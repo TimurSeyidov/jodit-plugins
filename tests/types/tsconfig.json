@@ -9,5 +9,5 @@
 		"skipLibCheck": true,
 		"types": []
 	},
-	"files": ["consumer.ts"]
+	"files": ["consumer.ts", "../e2e/esm/app.ts"]
 }

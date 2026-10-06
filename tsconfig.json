@@ -10,5 +10,7 @@
 		"verbatimModuleSyntax": true,
 		"experimentalDecorators": true
 	},
-	"include": ["packages/*/src", "packages/*/test", "tests"]
+	"include": ["packages/*/src", "packages/*/test", "tests"],
+	// Import the built packages; compiled by `npm run test:types` after the build
+	"exclude": ["tests/types", "tests/e2e/esm"]
 }
