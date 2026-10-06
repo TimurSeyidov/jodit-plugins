@@ -1,0 +1,26 @@
+.jodit-demo-result {
+	margin: -0.6em 0 1.5em;
+	padding: 1em;
+	border: 1px solid var(--md-default-fg-color--lightest);
+	border-top: 0;
+	border-radius: 0 0 0.2rem 0.2rem;
+}
+
+.jodit-demo-result::before {
+	content: 'Result';
+	display: block;
+	margin-bottom: 0.6em;
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	color: var(--md-default-fg-color--light);
+}
+
+/* Material styles leak into the editing area */
+.md-typeset .jodit-wysiwyg p {
+	margin: 0 0 1em;
+}
+
+.md-typeset .jodit-wysiwyg img {
+	display: inline;
+}

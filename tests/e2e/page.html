@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plugin tests</title>
+<script>
+	// ?build=es2021 (or es2015, es2018) loads that build of Jodit and of the
+	// plugins; ?plugins=qrcode,mailto selects the plugins, an empty value loads
+	// none (for extraPlugins tests)
+	const query = new URLSearchParams(location.search);
+	const build = query.get('build') || 'es2021';
+	const plugins = (query.get('plugins') ?? 'qrcode,mailto').split(',').filter(Boolean);
+
+	document.write(`<link rel="stylesheet" href="/bundle/${build}/jodit.min.css">`);
+	document.write(`<script src="/bundle/${build}/jodit.min.js"><\/script>`);
+	plugins.forEach(name =>
+		document.write(`<script src="/bundle/${build}/plugins/${name}/${name}.min.js"><\/script>`)
+	);
+</script>
+</head>
+<body>
+<textarea id="editor"></textarea>
+</body>
+</html>

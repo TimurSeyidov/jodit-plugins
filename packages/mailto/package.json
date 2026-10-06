@@ -1,0 +1,56 @@
+{
+	"name": "jodit-plugin-mailto",
+	"version": "0.1.0",
+	"description": "Jodit editor plugin that inserts email links (mailto:) with To, Cc, Bcc, Subject and Body fields, validation and editing of existing links",
+	"keywords": [
+		"jodit",
+		"jodit-plugin",
+		"mailto",
+		"email",
+		"link",
+		"wysiwyg",
+		"editor"
+	],
+	"homepage": "https://timurseyidov.github.io/jodit-plugins/plugins/mailto/",
+	"bugs": {
+		"url": "https://github.com/TimurSeyidov/jodit-plugins/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TimurSeyidov/jodit-plugins.git",
+		"directory": "packages/mailto"
+	},
+	"author": "Timur Seiidov",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./browser": "./dist/es2021/plugins/mailto/mailto.min.js",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist/"
+	],
+	"scripts": {
+		"prepublishOnly": "node ../../tools/build.mjs mailto"
+	},
+	"sideEffects": true,
+	"jsdelivr": "./dist/es2021/plugins/mailto/mailto.min.js",
+	"unpkg": "./dist/es2021/plugins/mailto/mailto.min.js",
+	"peerDependencies": {
+		"jodit": "^4.0.0"
+	},
+	"docs": {
+		"order": [
+			"installation.md",
+			"options.md",
+			"examples.md"
+		]
+	}
+}

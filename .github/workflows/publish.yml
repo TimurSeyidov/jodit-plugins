@@ -1,0 +1,68 @@
+name: Publish
+
+# Publish one package to npm when its tag is pushed: `<dir>-v<version>`, for
+# example `qrcode-v0.2.0` for packages/qrcode. Uses npm trusted publishing
+# (OIDC): no token, provenance is attached automatically. The trusted
+# publisher (this repository + publish.yml) is configured in each package's
+# settings on npmjs.com.
+
+on:
+  push:
+    tags:
+      - '*-v*'
+
+permissions:
+  contents: read
+  id-token: write # trusted publishing and provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # No `registry-url`: it writes an .npmrc with a placeholder token, and npm
+      # then tries that token instead of trusted publishing (E404 on publish)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Trusted publishing needs npm 11.5.1 or newer
+      - run: npm install -g npm@^11.5.1
+
+      - run: npm ci
+
+      - name: Resolve the package from the tag
+        id: pkg
+        run: |
+          dir="${GITHUB_REF_NAME%-v*}"
+          tag_version="${GITHUB_REF_NAME##*-v}"
+          if [ ! -f "packages/$dir/package.json" ]; then
+            echo "::error::No package packages/$dir for tag $GITHUB_REF_NAME"
+            exit 1
+          fi
+          version="$(node -p "require('./packages/$dir/package.json').version")"
+          if [ "$version" != "$tag_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match packages/$dir/package.json $version"
+            exit 1
+          fi
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test:unit
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+
+      # A version published by hand (the very first one) is skipped, not failed
+      - name: Publish unless this version is already on npm
+        working-directory: packages/${{ steps.pkg.outputs.dir }}
+        run: |
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "$name@$version is already published, nothing to do"
+          else
+            npm publish --access public
+          fi

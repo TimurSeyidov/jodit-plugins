@@ -1,0 +1,58 @@
+{
+	"name": "jodit-plugin-qrcode",
+	"version": "0.1.0",
+	"description": "Jodit editor plugin that inserts QR codes: toolbar button, live preview, editing of inserted codes",
+	"keywords": [
+		"jodit",
+		"jodit-plugin",
+		"qrcode",
+		"qr-code",
+		"wysiwyg",
+		"editor"
+	],
+	"homepage": "https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/",
+	"bugs": {
+		"url": "https://github.com/TimurSeyidov/jodit-plugins/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TimurSeyidov/jodit-plugins.git",
+		"directory": "packages/qrcode"
+	},
+	"author": "Timur Seiidov",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./browser": "./dist/es2021/plugins/qrcode/qrcode.min.js",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist/"
+	],
+	"scripts": {
+		"prepublishOnly": "node ../../tools/build.mjs qrcode"
+	},
+	"sideEffects": true,
+	"jsdelivr": "./dist/es2021/plugins/qrcode/qrcode.min.js",
+	"unpkg": "./dist/es2021/plugins/qrcode/qrcode.min.js",
+	"peerDependencies": {
+		"jodit": "^4.0.0"
+	},
+	"dependencies": {
+		"qrcode": "^1.5.4"
+	},
+	"docs": {
+		"order": [
+			"installation.md",
+			"options.md",
+			"examples.md"
+		]
+	}
+}
