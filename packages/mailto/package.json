@@ -1,6 +1,6 @@
 {
 	"name": "jodit-plugin-mailto",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Jodit editor plugin that inserts email links (mailto:) with To, Cc, Bcc, Subject and Body fields, validation and editing of existing links",
 	"keywords": [
 		"jodit",

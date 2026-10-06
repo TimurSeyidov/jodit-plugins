@@ -1,6 +1,6 @@
 {
 	"name": "jodit-plugin-qrcode",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Jodit editor plugin that inserts QR codes: toolbar button, live preview, editing of inserted codes",
 	"keywords": [
 		"jodit",
