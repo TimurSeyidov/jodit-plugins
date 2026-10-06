@@ -296,7 +296,13 @@ function createForm(
 	});
 
 	void render(initial);
-	editor.async.setTimeout(() => input.focus(), 50);
+	// Focus the input once the popup is shown, unless the user has already
+	// clicked into the form
+	editor.async.setTimeout(() => {
+		if (!form.container.contains(form.container.ownerDocument.activeElement)) {
+			input.focus();
+		}
+	}, 50);
 
 	return form.container;
 }

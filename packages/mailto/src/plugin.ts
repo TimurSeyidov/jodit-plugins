@@ -401,7 +401,13 @@ function createForm(
 		return false;
 	});
 
+	// Focus the first empty field once the popup is shown, unless the user
+	// has already clicked into the form
 	editor.async.setTimeout(() => {
+		if (form.container.contains(form.container.ownerDocument.activeElement)) {
+			return;
+		}
+
 		const first = main
 			.map(field => inputs.get(field))
 			.find(input => input && !input.value);
