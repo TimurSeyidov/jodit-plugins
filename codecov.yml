@@ -1,0 +1,20 @@
+# Coverage of the unit tests (flag `unit`) and of the browser tests (flag
+# `e2e`) is uploaded by ci.yml; Codecov merges them into one report.
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        informational: true
+
+comment:
+  layout: "condensed_header, diff, flags, files"
+  require_changes: true
+
+flag_management:
+  default_rules:
+    carryforward: false

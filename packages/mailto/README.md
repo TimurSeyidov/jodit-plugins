@@ -4,6 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/jodit-plugin-mailto)](https://www.npmjs.com/package/jodit-plugin-mailto)
 [![jsDelivr hits](https://img.shields.io/jsdelivr/npm/hm/jodit-plugin-mailto)](https://www.jsdelivr.com/package/npm/jodit-plugin-mailto)
 [![CI](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/TimurSeyidov/jodit-plugins/graph/badge.svg)](https://codecov.io/gh/TimurSeyidov/jodit-plugins)
 [![License: MIT](https://img.shields.io/npm/l/jodit-plugin-mailto)](https://github.com/TimurSeyidov/jodit-plugins/blob/main/LICENSE)
 
 Email links for the [Jodit](https://xdsoft.net/jodit/) editor: a toolbar button that inserts `mailto:` links. The dialog has a short form (To, Subject, link text) and an "Additional" tab with every field: To, Cc, Bcc, Subject, Body and the link text. Required fields are configurable, addresses are checked, and existing links can be edited or removed. No dependencies.

@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml)
 [![Docs](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/pages.yml/badge.svg)](https://timurseyidov.github.io/jodit-plugins/)
+[![Coverage](https://codecov.io/gh/TimurSeyidov/jodit-plugins/graph/badge.svg)](https://codecov.io/gh/TimurSeyidov/jodit-plugins)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Plugins for the [Jodit](https://xdsoft.net/jodit/) editor. Each plugin is a separate npm package; the documentation with live demos **[live demos](https://timurseyidov.github.io/jodit-plugins/)**.
@@ -28,6 +29,7 @@ npm run docs:serve   # build packages and serve the site on http://127.0.0.1:809
 npm test             # unit and browser tests
 npm run test:unit    # unit tests (Vitest)
 npm run test:e2e     # build packages and run the browser tests (Playwright)
+npm run test:coverage  # both with coverage, into coverage/unit and coverage/e2e
 ```
 
 The browser tests need Chromium: `npx playwright install chromium` once, or run them in the installed Google Chrome with `PLAYWRIGHT_CHANNEL=chrome npm run test:e2e`.

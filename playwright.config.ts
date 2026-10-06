@@ -3,6 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 // Browser tests in tests/e2e/. The plugins are loaded from packages/*/dist, so
 // run `npm run build` first (`npm run test:e2e` does it).
 //
+// COVERAGE=1 also records the coverage into coverage/e2e (build with
+// `COVERAGE=1 npm run build` first, for the source maps).
+//
 // PLAYWRIGHT_CHANNEL=chrome runs the installed Google Chrome instead of the
 // Chromium downloaded by `npx playwright install chromium`.
 
@@ -10,6 +13,8 @@ const PORT = 8097;
 
 export default defineConfig({
 	testDir: 'tests/e2e',
+	globalSetup: './tests/e2e/global-setup.ts',
+	globalTeardown: './tests/e2e/global-teardown.ts',
 	fullyParallel: true,
 	forbidOnly: Boolean(process.env.CI),
 	retries: process.env.CI ? 1 : 0,

@@ -6,3 +6,4 @@ site/
 test-results/
 playwright-report/
 __pycache__/
+coverage/

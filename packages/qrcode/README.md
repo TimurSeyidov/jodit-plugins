@@ -4,6 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/jodit-plugin-qrcode)](https://www.npmjs.com/package/jodit-plugin-qrcode)
 [![jsDelivr hits](https://img.shields.io/jsdelivr/npm/hm/jodit-plugin-qrcode)](https://www.jsdelivr.com/package/npm/jodit-plugin-qrcode)
 [![CI](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/TimurSeyidov/jodit-plugins/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/TimurSeyidov/jodit-plugins/graph/badge.svg)](https://codecov.io/gh/TimurSeyidov/jodit-plugins)
 [![License: MIT](https://img.shields.io/npm/l/jodit-plugin-qrcode)](https://github.com/TimurSeyidov/jodit-plugins/blob/main/LICENSE)
 
 QR codes for the [Jodit](https://xdsoft.net/jodit/) editor: a toolbar button that turns any text or link into a QR code image, with a live preview and editing of inserted codes. The image is generated in the browser, no server needed.

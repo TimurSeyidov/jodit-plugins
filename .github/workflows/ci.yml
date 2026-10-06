@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  id-token: write # Codecov upload with OIDC, no token
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,10 +28,33 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - run: npm run test:unit
+      - run: npm run test:unit -- --coverage
 
+      # The browser tests run on a build with inline source maps, so their
+      # coverage is reported for packages/*/src
       - run: npx playwright install --with-deps chromium
+      - run: npm run build
+        env:
+          COVERAGE: 1
       - run: npx playwright test
+        env:
+          COVERAGE: 1
+
+      - uses: codecov/codecov-action@v5
+        if: ${{ !cancelled() }}
+        with:
+          use_oidc: true
+          files: coverage/unit/lcov.info
+          flags: unit
+          fail_ci_if_error: false
+
+      - uses: codecov/codecov-action@v5
+        if: ${{ !cancelled() }}
+        with:
+          use_oidc: true
+          files: coverage/e2e/lcov.info
+          flags: e2e
+          fail_ci_if_error: false
 
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -36,6 +63,7 @@ jobs:
           path: test-results/
           retention-days: 7
 
+      - run: npm run build
       - run: pip install -r requirements-docs.txt
       - run: mkdocs build --strict
         env:
