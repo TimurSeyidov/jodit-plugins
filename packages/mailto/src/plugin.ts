@@ -36,8 +36,12 @@ const STYLES = `
 .jodit-mailto_required .jodit-ui-text-area__label::after { content: ' *'; color: #d32f2f; }
 .jodit-mailto__tabs { margin-bottom: 4px; }
 .jodit-mailto__href {
-	margin: 4px 0 8px; padding: 4px 6px; font: 11px/1.4 monospace;
+	margin: 0 0 8px; padding: 4px 6px; font: 11px/1.4 monospace;
 	word-break: break-all; opacity: 0.75; background: rgba(127, 127, 127, 0.1);
+}
+.jodit-mailto__footer {
+	position: sticky; bottom: 0; z-index: 1; padding-top: 6px;
+	background: var(--color-background-default, #fff);
 }
 `;
 
@@ -376,7 +380,11 @@ function createForm(
 		tabs.update();
 	}
 
-	form.container.insertBefore(href, actions.container);
+	// The preview and the buttons stay at the bottom of the popup while the
+	// fields scroll: the full form is higher than the popup may be
+	const footer = editor.c.div('jodit-mailto__footer');
+	form.container.insertBefore(footer, actions.container);
+	footer.append(href, actions.container);
 	updateHref();
 
 	// The form validates required fields; addresses are checked here too, and
