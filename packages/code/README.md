@@ -1,4 +1,4 @@
-# jodit-plugin-code
+# CodeBlock Jodit plugin
 
 [![npm version](https://img.shields.io/npm/v/jodit-plugin-code)](https://www.npmjs.com/package/jodit-plugin-code)
 [![npm downloads](https://img.shields.io/npm/dm/jodit-plugin-code)](https://www.npmjs.com/package/jodit-plugin-code)
