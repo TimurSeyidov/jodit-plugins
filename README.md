@@ -9,12 +9,9 @@ Plugins for the [Jodit](https://xdsoft.net/jodit/) editor. Each plugin is a sepa
 
 | Plugin | Package | Version | Docs |
 | --- | --- | --- | --- |
+| Code block | [`jodit-plugin-code`](packages/code) | [![npm](https://img.shields.io/npm/v/jodit-plugin-code)](https://www.npmjs.com/package/jodit-plugin-code) | [Docs](https://timurseyidov.github.io/jodit-plugins/plugins/code/) |
 | Email link | [`jodit-plugin-mailto`](packages/mailto) | [![npm](https://img.shields.io/npm/v/jodit-plugin-mailto)](https://www.npmjs.com/package/jodit-plugin-mailto) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/) |
 | QR code | [`jodit-plugin-qrcode`](packages/qrcode) | [![npm](https://img.shields.io/npm/v/jodit-plugin-qrcode)](https://www.npmjs.com/package/jodit-plugin-qrcode) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/) |
-
-| QR code | Email link |
-| --- | --- |
-| ![Inserting and editing a QR code in Jodit](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/media/qrcode.gif) | ![Inserting an email link with the short form and the "Additional" tab](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/media/mailto.gif) |
 
 ## Development
 

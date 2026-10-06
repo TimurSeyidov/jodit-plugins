@@ -9,7 +9,7 @@
 	// none (for extraPlugins tests)
 	const query = new URLSearchParams(location.search);
 	const build = query.get('build') || 'es2021';
-	const plugins = (query.get('plugins') ?? 'qrcode,mailto').split(',').filter(Boolean);
+	const plugins = (query.get('plugins') ?? 'qrcode,mailto,code').split(',').filter(Boolean);
 
 	document.write(`<link rel="stylesheet" href="/bundle/${build}/jodit.min.css">`);
 	document.write(`<script src="/bundle/${build}/jodit.min.js"><\/script>`);

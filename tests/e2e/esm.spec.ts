@@ -62,6 +62,7 @@ test.describe('ES module', () => {
 			return {
 				qrcode: Boolean(Jodit.plugins.get('qrcode')),
 				mailto: Boolean(Jodit.plugins.get('mailto')),
+				code: Boolean(Jodit.plugins.get('code')),
 				sameLinkControl: Jodit.defaultOptions.controls.link === before
 			};
 		});
@@ -69,6 +70,7 @@ test.describe('ES module', () => {
 		expect(state).toEqual({
 			qrcode: true,
 			mailto: true,
+			code: true,
 			sameLinkControl: true
 		});
 	});

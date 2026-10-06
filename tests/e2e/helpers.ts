@@ -33,7 +33,7 @@ export interface PageOptions {
 export async function openEditor(
 	page: Page,
 	options: Record<string, unknown> = {},
-	{ build = 'es2021', plugins = ['qrcode', 'mailto'] }: PageOptions = {}
+	{ build = 'es2021', plugins = ['qrcode', 'mailto', 'code'] }: PageOptions = {}
 ): Promise<void> {
 	await page.goto(
 		`/tests/e2e/page.html?build=${build}&plugins=${plugins.join(',')}`
@@ -80,13 +80,11 @@ export function inlineToolbar(page: Page): Promise<string[]> {
 	return page.$$eval('.jodit-popup .jodit-toolbar-button', buttons =>
 		buttons.map(
 			button =>
+				// `jodit-ui-group__<name>` keeps the name as it is; the
+				// `jodit-toolbar-button_<name>` class turns dashes into `_`
 				[...button.classList]
-					.find(
-						name =>
-							/^jodit-toolbar-button_[a-z]+$/.test(name) &&
-							!/_(size|variant|text)/.test(name)
-					)
-					?.replace('jodit-toolbar-button_', '') ?? ''
+					.find(name => name.startsWith('jodit-ui-group__'))
+					?.replace('jodit-ui-group__', '') ?? ''
 		)
 	);
 }

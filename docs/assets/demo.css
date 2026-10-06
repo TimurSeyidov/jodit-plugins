@@ -24,3 +24,8 @@
 .md-typeset .jodit-wysiwyg img {
 	display: inline;
 }
+
+/* Code blocks in the pages have their own copy button (the runtime) */
+.md-typeset .jodit-code .md-clipboard {
+	display: none;
+}

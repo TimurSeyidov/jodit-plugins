@@ -1,0 +1,67 @@
+{
+	"name": "jodit-plugin-code",
+	"version": "1.0.0",
+	"description": "Jodit editor plugin that inserts code blocks with syntax highlighting: language choice, live preview, line numbers, inline styles with CSS variables, and a copy button runtime for the site",
+	"keywords": [
+		"jodit",
+		"jodit-plugin",
+		"code",
+		"code-block",
+		"syntax-highlighting",
+		"highlight.js",
+		"wysiwyg",
+		"editor"
+	],
+	"homepage": "https://timurseyidov.github.io/jodit-plugins/plugins/code/",
+	"bugs": {
+		"url": "https://github.com/TimurSeyidov/jodit-plugins/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TimurSeyidov/jodit-plugins.git",
+		"directory": "packages/code"
+	},
+	"author": "Timur Seiidov",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./runtime": {
+			"types": "./dist/types/runtime.d.ts",
+			"import": "./dist/runtime.mjs"
+		},
+		"./browser": "./dist/es2021/plugins/code/code.min.js",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist/",
+		"CHANGELOG.md"
+	],
+	"scripts": {
+		"prepublishOnly": "node ../../tools/build.mjs code"
+	},
+	"sideEffects": true,
+	"jsdelivr": "./dist/es2021/plugins/code/code.min.js",
+	"unpkg": "./dist/es2021/plugins/code/code.min.js",
+	"peerDependencies": {
+		"jodit": "^4.0.0"
+	},
+	"dependencies": {
+		"highlight.js": "^11.12.0"
+	},
+	"docs": {
+		"order": [
+			"installation.md",
+			"options.md",
+			"styling.md",
+			"runtime.md",
+			"examples.md"
+		]
+	}
+}

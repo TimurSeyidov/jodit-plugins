@@ -5,6 +5,10 @@
 //                                       script for a <script> tag or `extraPlugins`, uses window.Jodit;
 //                                       one per target, the same folders as the Jodit builds
 //
+// A package with src/runtime.ts (code that runs on the pages showing the
+// content, not in the editor) also gets dist/runtime.mjs and
+// dist/<target>/plugins/<name>/<name>-runtime(.min).js from src/runtime-browser.ts.
+//
 // With COVERAGE=1 every bundle gets an inline source map, so the coverage of
 // the browser tests can be mapped back to src/. Do not publish such a build.
 //
@@ -90,6 +94,37 @@ async function buildPackage(pkgDir) {
 				external: Object.keys(pkg.peerDependencies ?? {}),
 				minify
 			});
+		}
+	}
+
+	if (existsSync(join(pkgDir, 'src/runtime.ts'))) {
+		await build({
+			...common,
+			entryPoints: [join(pkgDir, 'src/runtime.ts')],
+			outfile: join(dist, 'runtime.mjs'),
+			format: 'esm',
+			platform: 'browser',
+			target: 'es2021'
+		});
+
+		for (const target of TARGETS) {
+			for (const minify of [false, true]) {
+				await build({
+					...common,
+					entryPoints: [join(pkgDir, 'src/runtime-browser.ts')],
+					outfile: join(
+						dist,
+						target,
+						'plugins',
+						name,
+						`${name}-runtime${minify ? '.min' : ''}.js`
+					),
+					format: 'iife',
+					platform: 'browser',
+					target,
+					minify
+				});
+			}
 		}
 	}
 

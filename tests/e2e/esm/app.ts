@@ -6,6 +6,7 @@ import { Jodit } from 'jodit';
 import 'jodit/es2021/jodit.min.css';
 import 'jodit-plugin-qrcode';
 import 'jodit-plugin-mailto';
+import 'jodit-plugin-code';
 import { registerMailto } from 'jodit-plugin-mailto';
 import { registerQrCode } from 'jodit-plugin-qrcode';
 

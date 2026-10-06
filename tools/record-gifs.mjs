@@ -65,6 +65,49 @@ async function caretToEnd(page) {
 }
 
 const scenarios = {
+	async code(page, size) {
+		await page.evaluate(() => {
+			window.editor.value = '<p>Greet a user by name:</p>';
+		});
+		await caretToEnd(page);
+		await pause(600);
+
+		const dialog = page.locator('.jodit-dialog_active_true .jodit-dialog__panel');
+		await click(page, page.locator('.jodit-toolbar-button_code button'));
+		await pause(400);
+		await click(page, dialog.locator('select'));
+		await dialog.locator('select').selectOption('javascript');
+		await pause(500);
+
+		await click(page, dialog.locator('textarea'));
+		await page.keyboard.type('function greet(name) {\n', { delay: 40 });
+		await page.keyboard.press('Tab');
+		await page.keyboard.type('return `Hello, ${name}!`;\n', { delay: 40 });
+		await page.keyboard.type('}', { delay: 40 });
+		await pause(500);
+
+		await click(page, dialog.locator('.jodit-ui-checkbox').nth(0));
+		await pause(300);
+		await click(page, dialog.locator('.jodit-ui-checkbox').nth(1));
+		await pause(300);
+		await type(page, dialog.locator('.jodit-code-dialog__file input'), 'greet');
+		await click(page, dialog.locator('.jodit-tabs__button').nth(1));
+		await pause(1600);
+		await click(
+			page,
+			dialog.locator('.jodit-dialog__footer button', { hasText: 'Insert' })
+		);
+		await pause(900);
+
+		// The buttons of the header, then the toolbar of the block
+		await click(page, page.locator('.jodit-wysiwyg .jodit-code__copy'));
+		await pause(900);
+		await click(page, page.locator('.jodit-wysiwyg .jodit-code__lang'));
+		await pause(700);
+		await page.mouse.move(size.width - 40, size.height - 30, { steps: 12 });
+		await pause(1600);
+	},
+
 	async qrcode(page, size) {
 		await page.evaluate(() => {
 			window.editor.value = '<p>The conference schedule is online: </p>';
@@ -143,6 +186,13 @@ const scenarios = {
 // Window size and editor options of each recording; the window is high enough
 // for the open dialog
 const SETUP = {
+	code: {
+		size: { width: 800, height: 600 },
+		options: {
+			height: 540,
+			buttons: ['bold', 'italic', '|', 'link', 'code', '|', 'source']
+		}
+	},
 	qrcode: {
 		size: { width: 760, height: 580 },
 		options: {

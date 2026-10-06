@@ -1,0 +1,382 @@
+import { expect, test } from './fixtures';
+import type { Locator, Page } from '@playwright/test';
+
+import {
+	inlineToolbar,
+	isPressed,
+	openEditor,
+	placeCaret,
+	setValue,
+	toolbarButton,
+	value
+} from './helpers';
+
+const BUTTONS = ['bold', 'code', 'source'];
+
+const SAMPLE = "class Editor {\n\tbuttons = ['code'];\n}";
+
+const dialog = (page: Page): Locator =>
+	page.locator('.jodit-dialog_active_true .jodit-dialog__panel');
+const language = (page: Page): Locator => dialog(page).locator('select');
+const area = (page: Page): Locator => dialog(page).locator('textarea');
+const tab = (page: Page, index: number): Locator =>
+	dialog(page).locator('.jodit-tabs__button').nth(index);
+/** The line numbers switch: its input is hidden behind the switch styling */
+const lineNumbers = (page: Page): Locator =>
+	dialog(page).locator('.jodit-ui-checkbox').nth(0);
+const downloadSwitch = (page: Page): Locator =>
+	dialog(page).locator('.jodit-ui-checkbox').nth(1);
+const fileNameInput = (page: Page): Locator =>
+	dialog(page).locator('.jodit-code-dialog__file input');
+const footerButton = (page: Page, text: string): Locator =>
+	dialog(page).locator('.jodit-dialog__footer button', { hasText: text });
+
+/** HTML without the inline styles, for readable expectations */
+const bare = (html: string): string => html.replace(/ style="[^"]*"/g, '');
+
+async function insertCode(
+	page: Page,
+	code: string,
+	lang = 'javascript'
+): Promise<void> {
+	await toolbarButton(page, 'code').click();
+	await expect(dialog(page)).toBeVisible();
+	await language(page).selectOption(lang);
+	await area(page).fill(code);
+	await footerButton(page, 'Insert').click();
+	await expect(dialog(page)).toBeHidden();
+}
+
+test.describe('Code block', () => {
+	test('adds its button to the default toolbar', async ({ page }) => {
+		await openEditor(page);
+		await expect(toolbarButton(page, 'code')).toBeVisible();
+	});
+
+	test('inserts a highlighted block after the paragraph', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await setValue(page, '<p>Before</p>');
+		await placeCaret(page, 'p', 6);
+		await insertCode(page, SAMPLE);
+
+		const html = await value(page);
+		expect(bare(html)).toMatch(
+			/^<p>Before<\/p><div class="jodit-code" data-lang="javascript"><div class="jodit-code__header"><span class="jodit-code__lang">JavaScript<\/span><\/div><div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code language-javascript" data-lang="javascript"><span class="jodit-code__keyword">class<\/span> <span class="jodit-code__title">Editor<\/span>/
+		);
+		expect(html).toContain('style="color:var(--jodit-code-keyword,#cf222e)"');
+		expect(html).not.toContain('contenteditable');
+		expect(bare(html)).toMatch(/<\/div><p><br><\/p>$/);
+
+		// Not editable in the editor only
+		await expect(page.locator('.jodit-wysiwyg .jodit-code')).toHaveAttribute(
+			'contenteditable',
+			'false'
+		);
+	});
+
+	test('shows the block in the preview tab', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('python');
+		await area(page).fill('def f():\n    return 1');
+		await tab(page, 1).click();
+
+		const preview = dialog(page).locator('.jodit-code-dialog__preview .jodit-code');
+		await expect(preview).toBeVisible();
+		await expect(preview.locator('.jodit-code__lang')).toHaveText('Python');
+		await expect(preview.locator('.jodit-code__keyword').first()).toHaveText('def');
+
+		// The preview follows the settings
+		await lineNumbers(page).click();
+		await expect(preview.locator('.jodit-code__lines')).toHaveText('1\n2');
+	});
+
+	test('detects the language', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, '{\n  "name": "jodit",\n  "version": "1.0.0"\n}', 'auto');
+
+		expect(bare(await value(page))).toContain(
+			'<span class="jodit-code__lang">JSON</span>'
+		);
+	});
+
+	test('adds line numbers', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('plaintext');
+		await area(page).fill('a\nb\nc');
+		await lineNumbers(page).click();
+		await footerButton(page, 'Insert').click();
+
+		expect(bare(await value(page))).toContain(
+			'<pre class="jodit-code__lines" aria-hidden="true">1\n2\n3</pre>'
+		);
+	});
+
+	test('indents with Tab in the code field', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS, code: { indent: '  ' } });
+		await toolbarButton(page, 'code').click();
+		await area(page).fill('a\nb');
+		await area(page).evaluate((element: HTMLTextAreaElement) => {
+			element.setSelectionRange(0, element.value.length);
+		});
+		await area(page).press('Tab');
+		await expect(area(page)).toHaveValue('  a\n  b');
+
+		await area(page).press('Shift+Tab');
+		await expect(area(page)).toHaveValue('a\nb');
+		await expect(area(page)).toBeFocused();
+	});
+
+	test('does not insert an empty block', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await footerButton(page, 'Insert').click();
+
+		await expect(dialog(page)).toBeVisible();
+		await expect(area(page)).toBeFocused();
+	});
+
+	test('edits a block on double click', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, 'x = 1', 'python');
+
+		await page.locator('.jodit-wysiwyg .jodit-code').dblclick();
+		await expect(dialog(page)).toBeVisible();
+		await expect(language(page)).toHaveValue('python');
+		await expect(area(page)).toHaveValue('x = 1');
+		await expect(footerButton(page, 'Update')).toBeVisible();
+
+		await area(page).fill('x = 2');
+		await lineNumbers(page).click();
+		await footerButton(page, 'Update').click();
+
+		const html = bare(await value(page));
+		expect(html.match(/class="jodit-code"/g)).toHaveLength(1);
+		expect(html).toContain('<span class="jodit-code__number">2</span>');
+		expect(html).toContain('jodit-code__lines');
+	});
+
+	test('has an inline toolbar to edit, copy and delete', async ({
+		page,
+		context,
+		baseURL
+	}) => {
+		await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+			origin: baseURL
+		});
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+		await expect.poll(() => inlineToolbar(page)).toEqual([
+			'code-edit',
+			'code-copy',
+			'code-delete'
+		]);
+		await expect(page.locator('.jodit-wysiwyg .jodit-code')).toHaveClass(
+			/jodit-code_selected/
+		);
+		expect(await value(page)).not.toContain('jodit-code_selected');
+
+		await page.locator('.jodit-popup .jodit-ui-group__code-copy button').click();
+		await expect
+			.poll(() => page.evaluate(() => navigator.clipboard.readText()))
+			.toBe(SAMPLE);
+
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+		await page.locator('.jodit-popup .jodit-ui-group__code-edit button').click();
+		await expect(area(page)).toHaveValue(SAMPLE);
+		await footerButton(page, 'Cancel').click();
+
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+		await page.locator('.jodit-popup .jodit-ui-group__code-delete button').click();
+		expect(await value(page)).not.toContain('jodit-code');
+	});
+
+	test('deletes the selected block with the keyboard', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+		await page.keyboard.press('Delete');
+		expect(await value(page)).not.toContain('jodit-code');
+	});
+
+	test('turns a plain pre into a block', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await setValue(
+			page,
+			'<pre><code class="language-python">print("hi")</code></pre>'
+		);
+		await placeCaret(page, 'code', 2);
+
+		await expect.poll(() => isPressed(page, 'code')).toBe(true);
+		await toolbarButton(page, 'code').click();
+		await expect(language(page)).toHaveValue('python');
+		await expect(area(page)).toHaveValue('print("hi")');
+		await footerButton(page, 'Update').click();
+
+		const html = bare(await value(page));
+		expect(html).toMatch(/^<div class="jodit-code" data-lang="python">/);
+		expect(html).not.toContain('<pre><code class="language-python">');
+	});
+
+	test('has copy and download buttons in the editor', async ({
+		page,
+		context,
+		baseURL
+	}) => {
+		await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+			origin: baseURL
+		});
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('python');
+		await area(page).fill('print(1)');
+		await downloadSwitch(page).click();
+		await footerButton(page, 'Insert').click();
+
+		const block = page.locator('.jodit-wysiwyg .jodit-code');
+		await expect(block.locator('.jodit-code__header button')).toHaveCount(2);
+
+		await block.locator('.jodit-code__copy').click();
+		await expect
+			.poll(() => page.evaluate(() => navigator.clipboard.readText()))
+			.toBe('print(1)');
+		await expect(block.locator('.jodit-code__copy')).toHaveAttribute(
+			'aria-label',
+			'Copied'
+		);
+
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			block.locator('.jodit-code__download').click()
+		]);
+		expect(download.suggestedFilename()).toBe('Untitled.py');
+
+		// The buttons are not saved
+		const html = await value(page);
+		expect(html).toContain('data-download=""');
+		expect(html).not.toContain('<button');
+	});
+
+	test('asks for a file name only when the code is a file', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('typescript');
+
+		await expect(fileNameInput(page)).toBeHidden();
+		await downloadSwitch(page).click();
+		await expect(fileNameInput(page)).toBeVisible();
+		await expect(fileNameInput(page)).toHaveAttribute('placeholder', 'Untitled.ts');
+
+		await language(page).selectOption('python');
+		await expect(fileNameInput(page)).toHaveAttribute('placeholder', 'Untitled.py');
+
+		await area(page).fill('x = 1');
+		await fileNameInput(page).fill('script');
+		await tab(page, 1).click();
+		await expect(
+			dialog(page).locator('.jodit-code-dialog__preview .jodit-code__download')
+		).toBeVisible();
+
+		await footerButton(page, 'Insert').click();
+		expect(await value(page)).toContain('data-download="script"');
+
+		// Editing keeps the setting and the name
+		await page.locator('.jodit-wysiwyg .jodit-code').dblclick();
+		await expect(fileNameInput(page)).toHaveValue('script');
+		await downloadSwitch(page).click();
+		await footerButton(page, 'Update').click();
+		expect(await value(page)).not.toContain('data-download');
+	});
+
+	test('follows the language option', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS, language: 'ru' });
+		await toolbarButton(page, 'code').click();
+
+		await expect(dialog(page)).toContainText('Вставить код');
+		await expect(tab(page, 1)).toHaveText('Предпросмотр');
+		await expect(footerButton(page, 'Вставить')).toBeVisible();
+	});
+});
+
+test.describe('Code block runtime', () => {
+	test('adds a working copy button to the blocks on a page', async ({
+		page,
+		context,
+		baseURL
+	}) => {
+		await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+			origin: baseURL
+		});
+
+		// The HTML an editor saved, shown on a page with the runtime script
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		const html = await value(page);
+
+		await page.setContent(`<!doctype html><html><head></head><body>${html}</body></html>`);
+		await page.addScriptTag({
+			url: `${baseURL}/bundle/es2021/plugins/code/code-runtime.min.js`
+		});
+
+		const copy = page.locator('.jodit-code__copy');
+		await expect(copy).toHaveCount(1);
+		await expect(copy).toHaveAttribute('aria-label', 'Copy code');
+
+		await copy.click();
+		await expect(copy).toHaveAttribute('aria-label', 'Copied');
+		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(SAMPLE);
+
+		// A second run does not add another button
+		const added = await page.evaluate(() =>
+			(
+				window as unknown as { JoditCodeRuntime: { enhance(): number } }
+			).JoditCodeRuntime.enhance()
+		);
+		expect(added).toBe(0);
+		await expect(copy).toHaveCount(1);
+	});
+
+	test('leaves the blocks inside an editor alone', async ({ page, baseURL }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		await page.addScriptTag({
+			url: `${baseURL}/bundle/es2021/plugins/code/code-runtime.min.js`
+		});
+
+		// Only the button of the editor, not another one from the runtime
+		await expect(page.locator('.jodit-wysiwyg .jodit-code__copy')).toHaveCount(1);
+		await expect(
+			page.locator('.jodit-code__copy:not([data-jodit-code-button])')
+		).toHaveCount(0);
+		expect(await value(page)).not.toContain('jodit-code__copy');
+	});
+
+	test('adds a download button to blocks offered as a file', async ({
+		page,
+		baseURL
+	}) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('python');
+		await area(page).fill('print(1)');
+		await downloadSwitch(page).click();
+		await fileNameInput(page).fill('report');
+		await footerButton(page, 'Insert').click();
+		const html = await value(page);
+
+		await page.setContent(`<!doctype html><html><head></head><body>${html}</body></html>`);
+		await page.addScriptTag({
+			url: `${baseURL}/bundle/es2021/plugins/code/code-runtime.min.js`
+		});
+
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			page.locator('.jodit-code__download').click()
+		]);
+		expect(download.suggestedFilename()).toBe('report.py');
+	});
+});

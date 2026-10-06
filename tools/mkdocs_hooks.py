@@ -71,9 +71,11 @@ def on_config(config):
         config["nav"].append({"Plugins": plugins_nav})
 
     scripts = ["assets/vendor/jodit/jodit.min.js"]
-    scripts += [
-        f"assets/plugins/{name}/{name}.min.js" for name, _, _ in _packages()
-    ]
+    for name, pkg_dir, _ in _packages():
+        scripts.append(f"assets/plugins/{name}/{name}.min.js")
+        # Runtime for the pages that show the content, if the package has one
+        if (pkg_dir / "src" / "runtime.ts").is_file():
+            scripts.append(f"assets/plugins/{name}/{name}-runtime.min.js")
     config["extra_javascript"][:0] = scripts
     config["extra_css"][:0] = ["assets/vendor/jodit/jodit.min.css"]
 
@@ -104,11 +106,14 @@ def on_files(files, config):
             _sources[uri] = changelog.relative_to(ROOT).as_posix()
             add(uri, changelog)
 
-        bundle = f"{name}.min.js"
-        add(
-            f"assets/plugins/{name}/{bundle}",
-            pkg_dir / "dist" / "es2021" / "plugins" / name / bundle,
-        )
+        bundles = [f"{name}.min.js"]
+        if (pkg_dir / "src" / "runtime.ts").is_file():
+            bundles.append(f"{name}-runtime.min.js")
+        for bundle in bundles:
+            add(
+                f"assets/plugins/{name}/{bundle}",
+                pkg_dir / "dist" / "es2021" / "plugins" / name / bundle,
+            )
 
     return files
 
