@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 
-import type { QrCodeOptions } from './options';
+import type { QrCodeOptions } from './options.js';
 
 /**
  * Renders `text` as a QR code image and returns it as a `data:` URL

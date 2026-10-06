@@ -51,6 +51,8 @@ jobs:
 
       - run: npm run typecheck
       - run: npm run build
+      - run: npx tsc -p tests/types/tsconfig.json
+      - run: npx tsc -p tests/types/tsconfig.nodenext.json
       - run: npm run test:unit
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test

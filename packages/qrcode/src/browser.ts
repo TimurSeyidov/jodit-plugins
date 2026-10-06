@@ -1,6 +1,6 @@
 import type { Jodit as JoditType } from 'jodit';
 
-import { registerQrCode } from './plugin';
+import { registerQrCode } from './plugin.js';
 
 const Jodit = (globalThis as { Jodit?: typeof JoditType }).Jodit;
 

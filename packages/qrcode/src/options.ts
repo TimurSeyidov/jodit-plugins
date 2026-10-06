@@ -1,5 +1,3 @@
-import type { QRCodeErrorCorrectionLevel } from 'qrcode';
-
 /**
  * Settings of the QR code plugin, available as the `qrcode` editor option
  */
@@ -11,7 +9,7 @@ export interface QrCodeOptions {
 	margin: number;
 
 	/** Error correction level: L (7%), M (15%), Q (25%) or H (30%) */
-	errorCorrectionLevel: QRCodeErrorCorrectionLevel;
+	errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H';
 
 	/** Color of the dark modules, `#RRGGBB` or `#RRGGBBAA` */
 	dark: string;
@@ -40,7 +38,7 @@ export const defaultOptions: QrCodeOptions = {
 	className: ''
 };
 
-declare module 'jodit/types/config' {
+declare module 'jodit/types/config.js' {
 	interface Config {
 		qrcode: QrCodeOptions;
 	}

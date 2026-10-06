@@ -1,6 +1,6 @@
 import type { Jodit as JoditType } from 'jodit';
 
-import { registerMailto } from './plugin';
+import { registerMailto } from './plugin.js';
 
 const Jodit = (globalThis as { Jodit?: typeof JoditType }).Jodit;
 

@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 declare global {
@@ -124,4 +125,26 @@ export function selectText(page: Page, text: string): Promise<void> {
 
 		throw new Error(`Text not found: ${text}`);
 	}, text);
+}
+
+/** Inserts a QR code and an email link through the dialogs */
+export async function insertBoth(page: Page): Promise<void> {
+	await toolbarButton(page, 'qrcode').click();
+	await page.locator('.jodit-qrcode textarea').fill('https://example.com/');
+	await expect(page.locator('.jodit-qrcode__preview img')).toBeVisible();
+	await page.locator('.jodit-qrcode button[type=submit]').click();
+	await expect(page.locator('.jodit-qrcode')).toBeHidden();
+
+	await toolbarButton(page, 'mailto').click();
+	await page
+		.locator('.jodit-mailto [name="to"]')
+		.locator('visible=true')
+		.fill('a@x.com');
+	await page.locator('.jodit-mailto button[type=submit]').click();
+	await expect(page.locator('.jodit-mailto')).toBeHidden();
+
+	expect(await shortValue(page)).toBe(
+		'<p><img src="data:image/png;base64,…" alt="https://example.com/" data-qrcode="https://example.com/" ' +
+			'width="200" height="200"><a href="mailto:a@x.com">a@x.com</a></p>'
+	);
 }

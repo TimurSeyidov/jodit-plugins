@@ -28,6 +28,12 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+
+      # The published declarations, compiled as a project that installs the
+      # packages would (moduleResolution bundler and nodenext)
+      - run: npx tsc -p tests/types/tsconfig.json
+      - run: npx tsc -p tests/types/tsconfig.nodenext.json
+
       - run: npm run test:unit -- --coverage
 
       # The browser tests run on a build with inline source maps, so their

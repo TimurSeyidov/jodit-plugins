@@ -13,7 +13,9 @@ export const coverageOptions: CoverageReportOptions = {
 	outputDir: 'coverage/e2e',
 	reports: ['lcovonly', 'console-summary'],
 	entryFilter: entry =>
-		/\/plugins\/[\w-]+\/[\w-]+(\.min)?\.js$/.test(entry.url),
+		/\/plugins\/[\w-]+\/[\w-]+(\.min)?\.js$|\/esm\/dist\/app\.js$/.test(
+			entry.url
+		),
 	sourceFilter: sourcePath =>
 		/(^|\/)packages\/[\w-]+\/src\/.+\.ts$/.test(sourcePath),
 	sourcePath: sourcePath =>

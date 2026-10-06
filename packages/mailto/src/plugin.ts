@@ -1,18 +1,18 @@
 import type { Jodit as JoditType } from 'jodit';
-import type { IControlType, IJodit, IUIInput, Nullable } from 'jodit/types/types';
+import type { IControlType, IJodit, IUIInput, Nullable } from 'jodit/types/types/index.js';
 
 import icon from './icon.svg';
-import { langs } from './langs';
+import { langs } from './langs/index.js';
 import {
 	buildMailto,
 	invalidAddresses,
 	parseMailto,
 	splitAddresses
-} from './mailto';
-import type { MailtoFields } from './mailto';
-import { layout } from './layout';
-import { defaultOptions } from './options';
-import type { MailtoField, MailtoOptions } from './options';
+} from './mailto.js';
+import type { MailtoFields } from './mailto.js';
+import { layout } from './layout.js';
+import { defaultOptions } from './options.js';
+import type { MailtoField, MailtoOptions } from './options.js';
 
 /** Name of the plugin, the toolbar button and the icon */
 export const NAME = 'mailto';

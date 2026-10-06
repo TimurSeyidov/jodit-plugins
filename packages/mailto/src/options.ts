@@ -55,7 +55,7 @@ export const defaultOptions: MailtoOptions = {
 	className: ''
 };
 
-declare module 'jodit/types/config' {
+declare module 'jodit/types/config.js' {
 	interface Config {
 		mailto: MailtoOptions;
 	}

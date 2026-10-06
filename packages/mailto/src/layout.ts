@@ -3,7 +3,7 @@ import type {
 	MailtoFieldPlacement,
 	MailtoOptionalField,
 	MailtoOptions
-} from './options';
+} from './options.js';
 
 const OPTIONAL_FIELDS: MailtoOptionalField[] = ['subject', 'cc', 'bcc', 'body'];
 

@@ -26,8 +26,9 @@ npm run typecheck    # type-check the sources
 npm run docs         # build packages and the site into site/
 npm run docs:serve   # build packages and serve the site on http://127.0.0.1:8095
 
-npm test             # unit and browser tests
+npm test             # unit, type and browser tests
 npm run test:unit    # unit tests (Vitest)
+npm run test:types   # build packages and compile tests/types against their declarations
 npm run test:e2e     # build packages and run the browser tests (Playwright)
 npm run test:coverage  # both with coverage, into coverage/unit and coverage/e2e
 ```
@@ -54,6 +55,8 @@ packages/<name>/
 └── LICENSE
 docs/                  site pages shared by all plugins
 tests/e2e/             browser tests of all plugins (Playwright), with page.html loading any build
+tests/e2e/esm/         application bundled from the npm packages, for the ES module test
+tests/types/           a TypeScript consumer of the published declarations
 tools/build.mjs        builds every package with esbuild and tsc
 tools/mkdocs_hooks.py  adds packages/*/docs and the built plugins to the site
 tools/serve.mjs        static server for the browser tests

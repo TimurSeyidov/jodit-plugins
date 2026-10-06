@@ -7,9 +7,7 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			include: ['packages/*/src/**/*.ts'],
-			// index.ts: re-exports and the registration call of the ES module
-			// entry, which needs a browser
-			exclude: ['**/*.d.ts', 'packages/*/src/index.ts'],
+			exclude: ['**/*.d.ts'],
 			reporter: ['text-summary', 'lcovonly'],
 			reportsDirectory: 'coverage/unit'
 		}

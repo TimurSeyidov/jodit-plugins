@@ -1,10 +1,10 @@
 import type { Jodit as JoditType } from 'jodit';
-import type { IControlType, IJodit, Nullable } from 'jodit/types/types';
+import type { IControlType, IJodit, Nullable } from 'jodit/types/types/index.js';
 
-import { generate } from './generate';
+import { generate } from './generate.js';
 import icon from './icon.svg';
-import { langs } from './langs';
-import { defaultOptions } from './options';
+import { langs } from './langs/index.js';
+import { defaultOptions } from './options.js';
 
 /** Name of the plugin, the toolbar button and the icon */
 export const NAME = 'qrcode';
