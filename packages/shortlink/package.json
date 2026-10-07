@@ -1,7 +1,7 @@
 {
 	"name": "jodit-plugin-shortlink",
-	"version": "1.0.0",
-	"description": "Jodit editor plugin that shortens links with da.gd, clck.ru, cleanuri.com or your own service, from the link form and the link toolbar",
+	"version": "1.1.0",
+	"description": "Jodit editor plugin that shortens links with da.gd, clck.ru or your own service, from the link form and the link toolbar",
 	"keywords": [
 		"jodit",
 		"jodit-plugin",

@@ -4,6 +4,14 @@ All notable changes to `jodit-plugin-shortlink` are listed here. The format foll
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-07
+
+### Removed
+
+- The cleanuri.com service (`service: 'cleanuri'`, `services: { cleanuri: … }`) and the `proxy` option it needed: browsers cannot call cleanuri.com directly, and a proxy on the site is rarely set up. A service like it can still be used through your own server with a function as `service`.
+
+This removal breaks the 1.0.0 options that used cleanuri, which semantic versioning would release as 2.0.0. It comes as 1.1.0 because 1.0.0 was out for less than an hour and cleanuri did not work in it without a proxy. If you set `service: 'cleanuri'`, switch to `'dagd'`, `'clck'` or a function.
+
 ## [1.0.0] - 2026-10-07
 
 ### Added
@@ -17,5 +25,6 @@ All notable changes to `jodit-plugin-shortlink` are listed here. The format foll
 - English, German and Russian.
 - ES module for bundlers, and browser builds for ES2015, ES2018 and ES2021, for a `<script>` tag or `extraPlugins`.
 
-[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/shortlink-v1.0.0...HEAD
+[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/shortlink-v1.1.0...HEAD
+[1.1.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/shortlink-v1.0.0...shortlink-v1.1.0
 [1.0.0]: https://github.com/TimurSeyidov/jodit-plugins/releases/tag/shortlink-v1.0.0
