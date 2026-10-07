@@ -4,6 +4,11 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+### Added
+
+- Language button in the toolbar of a block: choosing another language highlights the code again and keeps the other settings of the block.
+- Line numbers switch in the toolbar of a block.
+
 ## [1.0.0] - 2026-10-07
 
 ### Added

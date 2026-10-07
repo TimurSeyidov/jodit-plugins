@@ -79,7 +79,7 @@ The header of the block gets a download button next to the copy button, in the e
 ## Editing
 
 - **Double-click** a block to open the dialog with its code, language, line numbers and file settings.
-- **Click** a block to select it and show its toolbar: edit, copy the code, delete. Delete and Backspace remove a selected block.
+- **Click** a block to select it and show its toolbar: the language (choose another one to highlight the code again), line numbers on and off, edit, copy the code, delete. The language list is the one of the dialog, see `languages`. Delete and Backspace remove a selected block.
 - The **copy and download buttons** in the header of a block work in the editor too; they are added in the editor only and are not saved with the HTML.
 - With the caret inside a plain `<pre>` (for example from pasted HTML), the code button opens the dialog with its text, and "Update" turns it into a highlighted block. The language is taken from a `language-*` or `lang-*` class if there is one.
 

@@ -2,6 +2,7 @@ import type { Jodit as JoditType } from 'jodit';
 import type {
 	IControlType,
 	IJodit,
+	IToolbarButton,
 	IUIButton,
 	IUIElement,
 	Nullable
@@ -12,6 +13,7 @@ import type { ButtonLabels } from './buttons.js';
 import { fileName } from './filename.js';
 import { AUTO, languageLabel, listLanguages } from './highlight.js';
 import icon from './icon.svg';
+import lineNumbersIcon from './line-numbers.svg';
 import { langs } from './langs/index.js';
 import { defaultOptions } from './options.js';
 import { findBlock, readBlock, unlockValue } from './parse.js';
@@ -20,6 +22,9 @@ import { renderBlock } from './render.js';
 
 /** Name of the plugin, the toolbar button and the icon */
 export const NAME = 'code';
+
+/** Name of the line numbers switch in the inline toolbar, and of its icon */
+const LINE_NUMBERS = 'code-line-numbers';
 
 /** Type of the inline toolbar of a block, see `Config.popup` */
 const POPUP = 'jodit-code';
@@ -40,6 +45,7 @@ const STYLES = `
 }
 .jodit-code-dialog__preview { flex: 1; min-height: 160px; overflow: auto; }
 .jodit-code-dialog__preview .jodit-code { margin: 0; }
+.jodit-code-languages { max-height: 300px; overflow-y: auto; }
 .jodit-wysiwyg .jodit-code { cursor: default; }
 .jodit-wysiwyg .jodit-code.jodit-code_selected { outline: 2px solid var(--jd-color-primary, #1e88e5); outline-offset: 1px; }
 `;
@@ -63,6 +69,7 @@ export function registerCode(Jodit: JoditStatic): void {
 	registered.add(Jodit);
 
 	Jodit.modules.Icon.set(NAME, icon);
+	Jodit.modules.Icon.set(LINE_NUMBERS, lineNumbersIcon);
 
 	const config = Jodit.defaultOptions;
 	config.code = { ...defaultOptions, ...config.code };
@@ -78,6 +85,47 @@ export function registerCode(Jodit: JoditStatic): void {
 	} as IControlType;
 
 	config.popup[POPUP] = [
+		{
+			name: 'code-language',
+			tooltip: 'Language',
+			update: (editor: IJodit, button: IToolbarButton) => {
+				const block = popupTarget(button);
+				button.state.icon.name = '';
+				button.state.text = block
+					? languageLabel(readBlock(block).language)
+					: editor.i18n('Language');
+			},
+			// With `exec` Jodit draws the dropdown arrow; `false` makes a click on
+			// the button itself open the list too
+			exec: () => false,
+			popup: (
+				editor: IJodit,
+				block: Nullable<Node>,
+				close: () => void
+			) => languageMenu(Jodit, editor, block as HTMLElement, close)
+		},
+		{
+			name: LINE_NUMBERS,
+			tooltip: 'Line numbers',
+			isActive: (_editor: IJodit, button: IToolbarButton) => {
+				const block = popupTarget(button);
+				return Boolean(block && readBlock(block).lineNumbers);
+			},
+			exec: (
+				editor: IJodit,
+				block: Nullable<Node>,
+				{ button }: { button: IToolbarButton }
+			) => {
+				const target = block as HTMLElement;
+				rerenderBlock(Jodit, editor, target, {
+					lineNumbers: !readBlock(target).lineNumbers
+				});
+				button.update();
+
+				// Not `undefined`: Jodit would close the inline toolbar
+				return true;
+			}
+		},
 		{
 			name: 'code-edit',
 			icon: 'pencil',
@@ -228,6 +276,96 @@ function selectBlock(Jodit: JoditStatic, editor: IJodit, block: HTMLElement): vo
 		() => Jodit.modules.Helpers.position(block, editor),
 		POPUP
 	);
+}
+
+/** The block of the inline toolbar that `button` belongs to */
+function popupTarget(button: IToolbarButton): HTMLElement | null {
+	const { target } = button;
+	return target && (target as Element).classList?.contains('jodit-code')
+		? (target as HTMLElement)
+		: null;
+}
+
+/** List of the languages offered in the dialog; choosing one highlights `block` again in that language */
+function languageMenu(
+	Jodit: JoditStatic,
+	editor: IJodit,
+	block: HTMLElement,
+	close: () => void
+): IUIElement {
+	const current = readBlock(block).language;
+	const languages = listLanguages(editor.o.code.languages);
+	const items = [
+		{ name: AUTO, label: editor.i18n('Auto detect') },
+		...languages,
+		// The language of the block when the list does not offer it
+		...(languages.some(({ name }) => name === current)
+			? []
+			: [{ name: current, label: languageLabel(current) }])
+	];
+
+	const menu = new Jodit.modules.ToolbarCollection(editor);
+	menu.mode = 'vertical';
+	menu.container.classList.add('jodit-code-languages');
+	menu.build(
+		items.map(({ name, label }) => ({
+			name: `code-language-${name}`,
+			text: label,
+			isActive: () => name === current,
+			exec: (
+				_editor: IJodit,
+				_current: Nullable<Node>,
+				{ originalEvent }: { originalEvent: Event }
+			) => {
+				// The menu is gone by the time the click reaches the window, so
+				// Jodit would take it for a click outside and close the toolbar
+				originalEvent.stopPropagation();
+				close();
+				rerenderBlock(Jodit, editor, block, { language: name });
+
+				// Not `false`: Jodit would run a command of the button's name
+				return true;
+			}
+		})) as Array<IControlType>
+	);
+
+	return menu;
+}
+
+/** Renders `block` again with `changes` to its language or line numbers, keeping the code and other settings */
+function rerenderBlock(
+	Jodit: JoditStatic,
+	editor: IJodit,
+	block: HTMLElement,
+	changes: Partial<Pick<BlockData, 'language' | 'lineNumbers'>>
+): void {
+	const current = readBlock(block);
+	const data = { ...current, ...changes };
+
+	if (
+		(data.language === current.language &&
+			data.lineNumbers === current.lineNumbers) ||
+		!editor.editor.contains(block)
+	) {
+		return;
+	}
+
+	const { html } = renderBlock(data.code, data.language, {
+		lineNumbers: data.lineNumbers,
+		tabSize: editor.o.code.tabSize,
+		className: editor.o.code.className,
+		download: data.download ?? false
+	});
+
+	// The block stays the same element: it is the target of the open inline toolbar
+	const next = editor.createInside.fromHTML(html) as HTMLElement;
+	[...block.attributes].forEach(({ name }) => block.removeAttribute(name));
+	[...next.attributes].forEach(({ name, value }) => block.setAttribute(name, value));
+	block.replaceChildren(...next.childNodes);
+	block.setAttribute('contenteditable', 'false');
+	addButtons(block, labels(editor), true);
+	editor.synchronizeValues();
+	selectBlock(Jodit, editor, block);
 }
 
 function unselectBlocks(editor: IJodit): void {

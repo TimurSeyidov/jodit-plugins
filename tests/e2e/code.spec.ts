@@ -157,7 +157,7 @@ test.describe('Code block', () => {
 		expect(html).toContain('jodit-code__lines');
 	});
 
-	test('has an inline toolbar to edit, copy and delete', async ({
+	test('has an inline toolbar for the language, line numbers, edit, copy and delete', async ({
 		page,
 		context,
 		baseURL
@@ -170,6 +170,8 @@ test.describe('Code block', () => {
 
 		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
 		await expect.poll(() => inlineToolbar(page)).toEqual([
+			'code-language',
+			'code-line-numbers',
 			'code-edit',
 			'code-copy',
 			'code-delete'
@@ -192,6 +194,77 @@ test.describe('Code block', () => {
 		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
 		await page.locator('.jodit-popup .jodit-ui-group__code-delete button').click();
 		expect(await value(page)).not.toContain('jodit-code');
+	});
+
+	test('changes the language from the inline toolbar', async ({ page }) => {
+		await openEditor(page, {
+			buttons: BUTTONS,
+			code: { languages: ['javascript', 'python'] }
+		});
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('javascript');
+		await area(page).fill(SAMPLE);
+		await lineNumbers(page).click();
+		await footerButton(page, 'Insert').click();
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+
+		const languageButton = page.locator(
+			'.jodit-popup .jodit-ui-group__code-language button'
+		);
+		await expect(languageButton).toHaveText('JavaScript');
+
+		// The arrow opens the list as the button does
+		const items = page.locator('.jodit-code-languages .jodit-toolbar-button');
+		await page
+			.locator('.jodit-popup .jodit-ui-group__code-language .jodit-toolbar-button__trigger')
+			.click();
+		await expect(items).toHaveCount(3);
+		await page.keyboard.press('Escape');
+		await expect(items).toHaveCount(0);
+
+		await languageButton.click();
+		await expect(items).toHaveText(['Auto detect', 'JavaScript', 'Python']);
+		await expect(items.nth(1)).toHaveAttribute('aria-pressed', 'true');
+		await expect(items.nth(2)).not.toHaveAttribute('aria-pressed', 'true');
+
+		await items.nth(2).click();
+		const html = bare(await value(page));
+		expect(html.match(/class="jodit-code"/g)).toHaveLength(1);
+		expect(html).toContain('data-lang="python"');
+		expect(html).toContain('<span class="jodit-code__lang">Python</span>');
+		expect(html).toContain('jodit-code__lines');
+		expect(await value(page)).not.toContain('contenteditable');
+
+		// The block stays selected, with its new language on the button
+		await expect(page.locator('.jodit-wysiwyg .jodit-code')).toHaveClass(
+			/jodit-code_selected/
+		);
+		await expect(languageButton).toHaveText('Python');
+	});
+
+	test('switches line numbers from the inline toolbar', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+
+		const button = page.locator('.jodit-popup .jodit-ui-group__code-line-numbers');
+		await expect(button).not.toHaveAttribute('aria-pressed', 'true');
+
+		await button.locator('button').click();
+		expect(bare(await value(page))).toContain(
+			'<pre class="jodit-code__lines" aria-hidden="true">1\n2\n3</pre>'
+		);
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+		await expect(page.locator('.jodit-wysiwyg .jodit-code')).toHaveClass(
+			/jodit-code_selected/
+		);
+
+		await button.locator('button').click();
+		const html = bare(await value(page));
+		expect(html).not.toContain('jodit-code__lines');
+		expect(html).toContain('data-lang="javascript"');
+		expect(html.match(/class="jodit-code"/g)).toHaveLength(1);
+		await expect(button).not.toHaveAttribute('aria-pressed', 'true');
 	});
 
 	test('deletes the selected block with the keyboard', async ({ page }) => {

@@ -15,7 +15,7 @@
 - **Looks right everywhere**: every part of the block has inline styles, so it needs no CSS on the site, in an email or in a CMS.
 - **Customizable**: the colors are CSS variables and every part has a `jodit-code__*` class.
 - **Copy and download buttons** in the header of the block: in the editor, and on the site from a 2 KB runtime script.
-- **Editing**: double-click a block, or click it and use its toolbar to edit, copy or delete it. Plain `<pre>` blocks become highlighted blocks when edited.
+- **Editing**: double-click a block, or click it and use its toolbar to change the language, switch line numbers, edit, copy or delete it. Plain `<pre>` blocks become highlighted blocks when edited.
 - **Translations**: English, German and Russian.
 
 ## Try it
