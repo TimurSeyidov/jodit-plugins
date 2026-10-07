@@ -104,6 +104,23 @@ const scenarios = {
 		await pause(900);
 		await click(page, page.locator('.jodit-wysiwyg .jodit-code__lang'));
 		await pause(700);
+
+		// Another language and no line numbers, from the toolbar of the block
+		const toolbar = page.locator('.jodit-popup .jodit-ui-group__code-language');
+		await click(page, toolbar.locator('button').first());
+		await pause(500);
+		await click(
+			page,
+			page.locator('.jodit-code-languages .jodit-toolbar-button', {
+				hasText: /^TypeScript$/
+			})
+		);
+		await pause(1000);
+		await click(
+			page,
+			page.locator('.jodit-popup .jodit-ui-group__code-line-numbers button')
+		);
+		await pause(1000);
 		await page.mouse.move(size.width - 40, size.height - 30, { steps: 12 });
 		await pause(1600);
 	},

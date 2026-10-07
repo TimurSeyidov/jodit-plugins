@@ -20,7 +20,7 @@
 
 ## Try it
 
-Press the code button, choose a language, paste some code, look at the "Preview" tab and press "Insert". Then click or double-click the block.
+Press the code button, choose a language, paste some code, look at the "Preview" tab and press "Insert". Then click the block to change its language or switch line numbers, or double-click it to edit the code.
 
 ``` { .js .jodit-demo }
 Jodit.make('#editor', {
