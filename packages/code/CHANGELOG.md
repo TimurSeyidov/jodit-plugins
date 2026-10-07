@@ -4,6 +4,8 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-07
+
 ### Added
 
 - "Site highlighting" switch for each block, in the dialog and in the toolbar of the block, and the `native` option for new blocks: the block keeps its frame, header and buttons, and its code is saved as plain `<code class="language-*">` without colors, for highlight.js, Prism or another highlighter of the site and its theme. In the editor it looks and works as any block; `data-native` keeps it this way when the HTML is edited again.
@@ -48,7 +50,8 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 - English, German and Russian.
 - ES module for bundlers, and browser builds for ES2015, ES2018 and ES2021 with highlight.js included, for a `<script>` tag or `extraPlugins`.
 
-[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.2.0...HEAD
+[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.3.0...HEAD
+[1.3.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.2.0...code-v1.3.0
 [1.2.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.1.0...code-v1.2.0
 [1.1.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.0.0...code-v1.1.0
 [1.0.0]: https://github.com/TimurSeyidov/jodit-plugins/releases/tag/code-v1.0.0
