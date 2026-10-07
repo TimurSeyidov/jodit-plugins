@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { extensionOf, fileName } from '../src/filename';
 import { listLanguages, registerLanguage } from '../src/highlight';
 import { lockValue, noHighlight, unlockValue } from '../src/parse';
-import { normalizeCode, renderBlock } from '../src/render';
+import { normalizeCode, renderBlock, renderNative } from '../src/render';
 
 /** HTML without the inline styles, for readable expectations */
 const bare = (html: string): string => html.replace(/ style="[^"]*"/g, '');
@@ -17,7 +17,7 @@ describe('renderBlock', () => {
 			'<div class="jodit-code" data-lang="javascript">' +
 				'<div class="jodit-code__header"><span class="jodit-code__lang">JavaScript</span></div>' +
 				'<div class="jodit-code__body"><pre class="jodit-code__pre">' +
-				'<code class="jodit-code__code nohighlight" data-lang="javascript">' +
+				'<code class="jodit-code__code nohighlight nohljsln" data-lang="javascript">' +
 				'<span class="jodit-code__keyword">let</span> a = <span class="jodit-code__number">1</span>;' +
 				'</code></pre></div></div>'
 		);
@@ -200,7 +200,7 @@ describe('unlockValue', () => {
 				'<pre class="jodit-code__pre"><code class="jodit-code__code language-javascript" data-lang="javascript">a</code></pre>'
 			)
 		).toBe(
-			'<pre class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="javascript">a</code></pre>'
+			'<pre class="jodit-code__pre"><code class="jodit-code__code nohighlight nohljsln" data-lang="javascript">a</code></pre>'
 		);
 	});
 });
@@ -213,7 +213,7 @@ describe('lockValue', () => {
 		expect(locked).not.toContain('<pre');
 		expect(bare(locked)).toContain('<div class="jodit-code__lines" aria-hidden="true">1\n2</div>');
 		expect(bare(locked)).toContain(
-			'<div class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="plaintext">a\nb</code></div>'
+			'<div class="jodit-code__pre"><code class="jodit-code__code nohighlight nohljsln" data-lang="plaintext">a\nb</code></div>'
 		);
 		// The inline styles keep the white space of a pre
 		expect(locked).toMatch(/<div class="jodit-code__pre" style="[^"]*white-space:pre[;"]/);
@@ -228,8 +228,73 @@ describe('lockValue', () => {
 describe('noHighlight', () => {
 	it('puts nohighlight in place of the language classes', () => {
 		expect(noHighlight('jodit-code__code language-js lang-ts')).toBe(
-			'jodit-code__code nohighlight'
+			'jodit-code__code nohighlight nohljsln'
 		);
-		expect(noHighlight('jodit-code__code nohighlight')).toBe('jodit-code__code nohighlight');
+		expect(noHighlight('jodit-code__code nohighlight')).toBe(
+			'jodit-code__code nohighlight nohljsln'
+		);
+	});
+});
+
+describe('renderNative', () => {
+	it('keeps the frame and the header, with the code as plain text for the site highlighter', () => {
+		const { language, html } = renderNative('if (a < b) {\n\treturn "x";\n}\n', 'javascript');
+
+		expect(language).toBe('javascript');
+		expect(bare(html)).toBe(
+			'<div class="jodit-code" data-lang="javascript" data-native="">' +
+				'<div class="jodit-code__header"><span class="jodit-code__lang">JavaScript</span></div>' +
+				'<div class="jodit-code__body"><pre class="jodit-code__pre">' +
+				'<code class="language-javascript">if (a &lt; b) {\n\treturn "x";\n}</code>' +
+				'</pre></div></div>'
+		);
+	});
+
+	it('leaves the colors of the code to the theme of the site', () => {
+		const { html } = renderNative('let a = 1;', 'javascript');
+		const code = /<code[^>]*>/.exec(html)?.[0] ?? '';
+		const block = /^<div[^>]*>/.exec(html)?.[0] ?? '';
+
+		expect(code).not.toMatch(/color|background/);
+		expect(block).not.toMatch(/background|color:/);
+		expect(html).not.toContain('nohighlight');
+		// The header keeps its own look
+		expect(html).toContain('background:var(--jodit-code-header-background,#eaeef2)');
+	});
+
+	it('keeps line numbers and the file, and detects the language', () => {
+		const { language, html } = renderNative(
+			'{\n  "name": "jodit",\n  "private": true\n}',
+			'auto',
+			{ lineNumbers: true, download: 'package' }
+		);
+
+		expect(language).toBe('json');
+		expect(bare(html)).toContain(
+			'<div class="jodit-code" data-lang="json" data-download="package" data-native="">'
+		);
+		expect(bare(html)).toContain('<pre class="jodit-code__lines" aria-hidden="true">1\n2\n3\n4</pre>');
+		// Its own line numbers: the line numbers plugin of highlight.js stays away
+		expect(bare(html)).toContain('<code class="language-json nohljsln">{\n  "name": "jodit",');
+		expect(renderNative('x', 'python').html).not.toContain('nohljsln');
+	});
+
+	it('leaves out the header, and the file with it', () => {
+		const { html } = renderBlock('x', 'python', { header: false, download: 'x' });
+		expect(bare(html)).toBe(
+			'<div class="jodit-code" data-lang="python"><div class="jodit-code__body"><pre class="jodit-code__pre">' +
+				'<code class="jodit-code__code nohighlight nohljsln" data-lang="python">x</code></pre></div></div>'
+		);
+		expect(bare(renderNative('x', 'python', { header: false }).html)).toBe(
+			'<div class="jodit-code" data-lang="python" data-native=""><div class="jodit-code__body"><pre class="jodit-code__pre">' +
+				'<code class="language-python">x</code></pre></div></div>'
+		);
+	});
+
+	it('marks a block of the editor that is saved this way', () => {
+		expect(renderBlock('x', 'python', { native: true }).html).toMatch(
+			/^<div class="jodit-code" data-lang="python" data-native="" style=/
+		);
+		expect(renderBlock('x', 'python').html).not.toContain('data-native');
 	});
 });

@@ -15,5 +15,12 @@ export default {
 	Update: 'Aktualisieren',
 	Cancel: 'Abbrechen',
 	Copied: 'Kopiert',
-	'Paste or type the code': 'Code einfügen oder eingeben'
+	'Paste or type the code': 'Code einfügen oder eingeben',
+	'Site highlighting': 'Hervorhebung der Website',
+	'Save as plain code for the highlighter of the site (highlight.js, Prism)': 'Als reinen Code für die Hervorhebung der Website speichern (highlight.js, Prism)',
+	'Use the highlighting of the site': 'Hervorhebung der Website verwenden',
+	'The block is saved as plain code for the highlighter of the site': 'Der Block wird als reiner Code für die Hervorhebung der Website gespeichert',
+	'The block is saved with its own highlighting': 'Der Block wird mit eigener Hervorhebung gespeichert',
+	Header: 'Kopfzeile',
+	'Header with the language and the copy and download buttons': 'Kopfzeile mit der Sprache und den Schaltflächen zum Kopieren und Herunterladen'
 };

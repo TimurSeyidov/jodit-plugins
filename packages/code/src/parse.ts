@@ -10,6 +10,12 @@ export interface BlockData {
 
 	/** Name of the file the code is offered as, `''` for the default name; `null` when it is not offered */
 	download: string | null;
+
+	/** Saved with plain code for the highlighter of the site, see `renderNative` */
+	native: boolean;
+
+	/** Has the header with the language and the copy and download buttons */
+	header: boolean;
 }
 
 /**
@@ -53,7 +59,12 @@ export function readBlock(block: HTMLElement): BlockData {
 		lineNumbers: Boolean(block.querySelector('.jodit-code__lines')),
 		download: block.classList.contains('jodit-code')
 			? block.getAttribute('data-download')
-			: null
+			: null,
+		native: block.classList.contains('jodit-code') && block.hasAttribute('data-native'),
+		// A plain <pre> gets the header when it becomes a block
+		header:
+			!block.classList.contains('jodit-code') ||
+			Boolean(block.querySelector('.jodit-code__header'))
 	};
 }
 
@@ -73,7 +84,7 @@ export function lockValue(html: string): string {
 
 /**
  * Removes what the editor adds to the blocks (buttons, non-editable state, selection, `<div>` in place of `<pre>`)
- * from an HTML value. The `<code>` of a block gets the `nohighlight` class in place of `language-*`, so that the
+ * from an HTML value. The `<code>` of a block gets the `nohighlight` and `nohljsln` classes in place of `language-*`, so that the
  * highlighters of a site (highlight.js, Prism) leave the block alone; its language stays in `data-lang`.
  */
 export function unlockValue(html: string): string {
@@ -95,10 +106,13 @@ export function unlockValue(html: string): string {
 		);
 }
 
-/** The classes of the `<code>` of a block with `nohighlight` in place of `language-*` */
+/** The classes of the `<code>` of a block with `nohighlight` and `nohljsln` in place of `language-*` */
 export function noHighlight(classes: string): string {
 	const rest = classes
 		.split(/\s+/)
-		.filter(name => name && name !== 'nohighlight' && !/^lang(?:uage)?-/.test(name));
-	return [...rest, 'nohighlight'].join(' ');
+		.filter(
+			name =>
+				name && name !== 'nohighlight' && name !== 'nohljsln' && !/^lang(?:uage)?-/.test(name)
+		);
+	return [...rest, 'nohighlight', 'nohljsln'].join(' ');
 }

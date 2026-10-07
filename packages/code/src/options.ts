@@ -11,8 +11,17 @@ export interface CodeOptions {
 	/** Show line numbers in a new block */
 	lineNumbers: boolean;
 
-	/** Offer the code of a new block as a file to download */
+	/** Show the header with the language and the copy and download buttons in a new block */
+	header: boolean;
+
+	/** Offer the code of a new block as a file to download; needs the header */
 	download: boolean;
+
+	/**
+	 * Save a new block as plain `<pre><code class="language-*">` for the highlighter of the site (highlight.js,
+	 * Prism) instead of the block with inline styles. Each block can be switched in the dialog and its toolbar.
+	 */
+	native: boolean;
 
 	/** Text inserted by the Tab key in the code field */
 	indent: string;
@@ -28,7 +37,9 @@ export const defaultOptions: CodeOptions = {
 	languages: [],
 	defaultLanguage: 'auto',
 	lineNumbers: false,
+	header: true,
 	download: false,
+	native: false,
 	indent: '\t',
 	tabSize: 4,
 	className: ''

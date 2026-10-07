@@ -4,6 +4,16 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+### Added
+
+- "Site highlighting" switch for each block, in the dialog and in the toolbar of the block, and the `native` option for new blocks: the block keeps its frame, header and buttons, and its code is saved as plain `<code class="language-*">` without colors, for highlight.js, Prism or another highlighter of the site and its theme. In the editor it looks and works as any block; `data-native` keeps it this way when the HTML is edited again.
+- "Header" switch for each block, in the dialog and in the toolbar of the block, and the `header` option for new blocks: without the header the block is the frame and the code, with no copy or download button; switching it off also stops offering the file.
+- `renderNative` to make that HTML outside the editor.
+
+### Changed
+
+- `<code>` of a block with its own colors also has the `nohljsln` class, and so has a block with site highlighting and its own line numbers: highlightjs-line-numbers.js, which numbers `code.nohighlight` too, no longer adds a second column of numbers. Blocks saved before get it when saved again.
+
 ## [1.2.0] - 2026-10-07
 
 ### Added

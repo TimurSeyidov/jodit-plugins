@@ -15,5 +15,12 @@ export default {
 	Update: 'Обновить',
 	Cancel: 'Отмена',
 	Copied: 'Скопировано',
-	'Paste or type the code': 'Вставьте или наберите код'
+	'Paste or type the code': 'Вставьте или наберите код',
+	'Site highlighting': 'Подсветка сайта',
+	'Save as plain code for the highlighter of the site (highlight.js, Prism)': 'Сохранять простым кодом для подсветки на сайте (highlight.js, Prism)',
+	'Use the highlighting of the site': 'Использовать подсветку сайта',
+	'The block is saved as plain code for the highlighter of the site': 'Блок сохраняется простым кодом для подсветки на сайте',
+	'The block is saved with its own highlighting': 'Блок сохраняется со своей подсветкой',
+	Header: 'Заголовок',
+	'Header with the language and the copy and download buttons': 'Заголовок с языком и кнопками копирования и скачивания'
 };

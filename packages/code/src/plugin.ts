@@ -14,17 +14,25 @@ import { fileName } from './filename.js';
 import { AUTO, languageLabel, listLanguages } from './highlight.js';
 import icon from './icon.svg';
 import lineNumbersIcon from './line-numbers.svg';
+import headerIcon from './header.svg';
+import nativeIcon from './native.svg';
 import { langs } from './langs/index.js';
 import { defaultOptions } from './options.js';
 import { findBlock, lockValue, readBlock, unlockValue } from './parse.js';
 import type { BlockData } from './parse.js';
-import { renderBlock } from './render.js';
+import { renderBlock, renderNative } from './render.js';
 
 /** Name of the plugin, the toolbar button and the icon */
 export const NAME = 'code';
 
 /** Name of the line numbers switch in the inline toolbar, and of its icon */
 const LINE_NUMBERS = 'code-line-numbers';
+
+/** Name of the switch of the header in the inline toolbar, and of its icon */
+const HEADER = 'code-header';
+
+/** Name of the switch of the site highlighting in the inline toolbar, and of its icon */
+const NATIVE = 'code-native';
 
 /** Type of the inline toolbar of a block, see `Config.popup` */
 const POPUP = 'jodit-code';
@@ -76,6 +84,8 @@ export function registerCode(Jodit: JoditStatic): void {
 
 	Jodit.modules.Icon.set(NAME, icon);
 	Jodit.modules.Icon.set(LINE_NUMBERS, lineNumbersIcon);
+	Jodit.modules.Icon.set(NATIVE, nativeIcon);
+	Jodit.modules.Icon.set(HEADER, headerIcon);
 
 	const config = Jodit.defaultOptions;
 	config.code = { ...defaultOptions, ...config.code };
@@ -136,6 +146,54 @@ export function registerCode(Jodit: JoditStatic): void {
 			}
 		},
 		{
+			name: HEADER,
+			tooltip: 'Header with the language and the copy and download buttons',
+			isActive: (_editor: IJodit, button: IToolbarButton) => {
+				const block = popupTarget(button);
+				return Boolean(block && readBlock(block).header);
+			},
+			exec: (
+				editor: IJodit,
+				block: Nullable<Node>,
+				{ button }: { button: IToolbarButton }
+			) => {
+				const target = block as HTMLElement;
+				rerenderBlock(Jodit, editor, target, { header: !readBlock(target).header });
+				button.update();
+
+				// Not `undefined`: Jodit would close the inline toolbar
+				return true;
+			}
+		},
+		{
+			name: NATIVE,
+			tooltip: 'Use the highlighting of the site',
+			isActive: (_editor: IJodit, button: IToolbarButton) => {
+				const block = popupTarget(button);
+				return Boolean(block && readBlock(block).native);
+			},
+			exec: (
+				editor: IJodit,
+				block: Nullable<Node>,
+				{ button }: { button: IToolbarButton }
+			) => {
+				const target = block as HTMLElement;
+				rerenderBlock(Jodit, editor, target, { native: !readBlock(target).native });
+				button.update();
+				editor.message.info(
+					editor.i18n(
+						readBlock(target).native
+							? 'The block is saved as plain code for the highlighter of the site'
+							: 'The block is saved with its own highlighting'
+					),
+					3000
+				);
+
+				// Not `undefined`: Jodit would close the inline toolbar
+				return true;
+			}
+		},
+		{
 			name: 'code-edit',
 			icon: 'pencil',
 			tooltip: 'Edit code',
@@ -185,7 +243,7 @@ export function registerCode(Jodit: JoditStatic): void {
 
 			// Before the first value gets into the editor, Jodit PRO included
 			editor.e.on('beforeSetNativeEditorValue.code', (data: { value: string }) => {
-				data.value = lockValue(data.value);
+				data.value = lockValue(expandNative(editor, data.value));
 			});
 		}
 
@@ -206,7 +264,7 @@ export function registerCode(Jodit: JoditStatic): void {
 				.on('afterInit.code change.code afterSetMode.code changePlace.code', lock)
 				// Blocks are not editable in the editor only
 				.on('afterGetValueFromEditor.code', (data: { value: string }) => {
-					data.value = unlockValue(data.value);
+					data.value = collapseNative(editor, unlockValue(data.value));
 				})
 				.on(editor.editor, 'click.code', (event: MouseEvent) => {
 					const block = findBlock(event.target as Node, editor.editor);
@@ -282,6 +340,18 @@ function lockBlocks(Jodit: JoditStatic, editor: IJodit): void {
 		return;
 	}
 
+	// Blocks saved for the site highlighter that came in another way than the
+	// value, for example pasted: their code is plain text, highlight it
+	editor.editor
+		.querySelectorAll<HTMLElement>('.jodit-code[data-native]')
+		.forEach(block => {
+			if (!block.querySelector('code.jodit-code__code')) {
+				block.replaceWith(
+					editor.createInside.fromHTML(lockValue(expandBlock(editor, block))) as HTMLElement
+				);
+			}
+		});
+
 	editor.editor
 		.querySelectorAll<HTMLElement>('.jodit-code')
 		.forEach(block => {
@@ -294,6 +364,62 @@ function lockBlocks(Jodit: JoditStatic, editor: IJodit): void {
 			block.setAttribute('contenteditable', 'false');
 			addButtons(block, labels(editor), true);
 		});
+}
+
+/** The HTML of the editor block, with highlighting, for a block saved for the site highlighter */
+function expandBlock(editor: IJodit, block: HTMLElement): string {
+	const data = readBlock(block);
+
+	return renderBlock(data.code, data.language, {
+		lineNumbers: data.lineNumbers,
+		tabSize: editor.o.code.tabSize,
+		className: editor.o.code.className,
+		download: data.download ?? false,
+		native: true,
+		header: data.header
+	}).html;
+}
+
+/** The blocks of an HTML value, through a template of the document of the editor */
+function eachBlock(
+	editor: IJodit,
+	html: string,
+	selector: string,
+	replace: (block: HTMLElement) => string
+): string {
+	const template = editor.od.createElement('template');
+	template.innerHTML = html;
+	template.content.querySelectorAll<HTMLElement>(selector).forEach(block => {
+		const next = editor.od.createElement('template');
+		next.innerHTML = replace(block);
+		block.replaceWith(next.content);
+	});
+
+	return template.innerHTML;
+}
+
+/** Highlights in the editor the blocks of an HTML value that are saved for the site highlighter */
+function expandNative(editor: IJodit, html: string): string {
+	return html.includes('data-native')
+		? eachBlock(editor, html, '.jodit-code[data-native]', block => expandBlock(editor, block))
+		: html;
+}
+
+/** Saves the blocks of an HTML value marked with `data-native` with plain code for the site highlighter */
+function collapseNative(editor: IJodit, html: string): string {
+	return html.includes('data-native')
+		? eachBlock(editor, html, '.jodit-code[data-native]', block => {
+				const data = readBlock(block);
+
+				return renderNative(data.code, data.language, {
+					lineNumbers: data.lineNumbers,
+					tabSize: editor.o.code.tabSize,
+					className: editor.o.code.className,
+					download: data.download ?? false,
+					header: data.header
+				}).html;
+			})
+		: html;
 }
 
 /** The block of the caret; a plain `<pre>` only when Jodit PRO does not handle them */
@@ -419,14 +545,16 @@ function rerenderBlock(
 	Jodit: JoditStatic,
 	editor: IJodit,
 	block: HTMLElement,
-	changes: Partial<Pick<BlockData, 'language' | 'lineNumbers'>>
+	changes: Partial<Pick<BlockData, 'language' | 'lineNumbers' | 'native' | 'header'>>
 ): void {
 	const current = readBlock(block);
 	const data = { ...current, ...changes };
 
 	if (
 		(data.language === current.language &&
-			data.lineNumbers === current.lineNumbers) ||
+			data.lineNumbers === current.lineNumbers &&
+			data.native === current.native &&
+			data.header === current.header) ||
 		!editor.editor.contains(block)
 	) {
 		return;
@@ -436,7 +564,10 @@ function rerenderBlock(
 		lineNumbers: data.lineNumbers,
 		tabSize: editor.o.code.tabSize,
 		className: editor.o.code.className,
-		download: data.download ?? false
+		// Without the header there is no download button: the block stops offering the file
+		download: data.header ? (data.download ?? false) : false,
+		native: data.native,
+		header: data.header
 	});
 
 	// The block stays the same element: it is the target of the open inline toolbar
@@ -510,12 +641,30 @@ function openDialog(
 		switch: true
 	});
 
+	const header = new UICheckbox(editor, {
+		name: 'header',
+		label: 'Header',
+		checked: current?.header ?? options.header,
+		switch: true
+	});
+	header.container.title = editor.i18n('Header with the language and the copy and download buttons');
+
 	const download = new UICheckbox(editor, {
 		name: 'download',
 		label: 'Download as a file',
 		checked: current ? current.download !== null : options.download,
 		switch: true
 	});
+
+	const native = new UICheckbox(editor, {
+		name: 'native',
+		label: 'Site highlighting',
+		checked: current?.native ?? options.native,
+		switch: true
+	});
+	native.container.title = editor.i18n(
+		'Save as plain code for the highlighter of the site (highlight.js, Prism)'
+	);
 
 	const name = new UIInput(editor, {
 		name: 'fileName',
@@ -552,7 +701,9 @@ function openDialog(
 			lineNumbers: isChecked(lineNumbers),
 			tabSize: options.tabSize,
 			className: options.className,
-			download: isChecked(download) ? name.value : false
+			download: isChecked(header) && isChecked(download) ? name.value : false,
+			native: isChecked(native),
+			header: isChecked(header)
 		});
 
 	const tabs = createTabs(Jodit, editor, [
@@ -572,7 +723,7 @@ function openDialog(
 		}
 	]);
 
-	const settings = new UIBlock(editor, [language, lineNumbers, download], {
+	const settings = new UIBlock(editor, [language, lineNumbers, header, download, native], {
 		className: 'jodit-code-dialog__settings'
 	});
 
@@ -582,7 +733,10 @@ function openDialog(
 	});
 
 	const updateFileRow = (): void => {
-		fileRow.container.style.display = isChecked(download) ? '' : 'none';
+		// The download button is in the header
+		download.container.style.display = isChecked(header) ? '' : 'none';
+		fileRow.container.style.display =
+			isChecked(header) && isChecked(download) ? '' : 'none';
 		(name.nativeInput as HTMLInputElement).placeholder = fileName(
 			language.value === AUTO ? render().language : language.value
 		);
@@ -631,6 +785,7 @@ function openDialog(
 	editor.e.on(language.nativeInput, 'change', refresh);
 	editor.e.on(lineNumbers.nativeInput, 'change', refresh);
 	editor.e.on(download.nativeInput, 'change', refresh);
+	editor.e.on(header.nativeInput, 'change', refresh);
 	editor.e.on(name.nativeInput, 'input', () => tabs.refresh());
 
 	editor.e.on(dialog, 'afterClose', () => {

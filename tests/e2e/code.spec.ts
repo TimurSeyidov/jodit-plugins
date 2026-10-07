@@ -23,11 +23,13 @@ const language = (page: Page): Locator => dialog(page).locator('select');
 const area = (page: Page): Locator => dialog(page).locator('textarea');
 const tab = (page: Page, index: number): Locator =>
 	dialog(page).locator('.jodit-tabs__button').nth(index);
-/** The line numbers switch: its input is hidden behind the switch styling */
-const lineNumbers = (page: Page): Locator =>
-	dialog(page).locator('.jodit-ui-checkbox').nth(0);
-const downloadSwitch = (page: Page): Locator =>
-	dialog(page).locator('.jodit-ui-checkbox').nth(1);
+/** A switch of the dialog by the name of its input, which is hidden behind the switch styling */
+const dialogSwitch = (page: Page, name: string): Locator =>
+	dialog(page).locator('.jodit-ui-checkbox').filter({ has: page.locator(`input[name="${name}"]`) });
+const lineNumbers = (page: Page): Locator => dialogSwitch(page, 'lineNumbers');
+const headerSwitch = (page: Page): Locator => dialogSwitch(page, 'header');
+const nativeSwitch = (page: Page): Locator => dialogSwitch(page, 'native');
+const downloadSwitch = (page: Page): Locator => dialogSwitch(page, 'download');
 const fileNameInput = (page: Page): Locator =>
 	dialog(page).locator('.jodit-code-dialog__file input');
 const footerButton = (page: Page, text: string): Locator =>
@@ -63,7 +65,7 @@ test.describe('Code block', () => {
 
 		const html = await value(page);
 		expect(bare(html)).toMatch(
-			/^<p>Before<\/p><div class="jodit-code" data-lang="javascript"><div class="jodit-code__header"><span class="jodit-code__lang">JavaScript<\/span><\/div><div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="javascript"><span class="jodit-code__keyword">class<\/span> <span class="jodit-code__title">Editor<\/span>/
+			/^<p>Before<\/p><div class="jodit-code" data-lang="javascript"><div class="jodit-code__header"><span class="jodit-code__lang">JavaScript<\/span><\/div><div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code nohighlight nohljsln" data-lang="javascript"><span class="jodit-code__keyword">class<\/span> <span class="jodit-code__title">Editor<\/span>/
 		);
 		expect(html).toContain('style="color:var(--jodit-code-keyword,#cf222e)"');
 		expect(html).not.toContain('contenteditable');
@@ -178,6 +180,8 @@ test.describe('Code block', () => {
 		await expect.poll(() => inlineToolbar(page)).toEqual([
 			'code-language',
 			'code-line-numbers',
+			'code-header',
+			'code-native',
 			'code-edit',
 			'code-copy',
 			'code-delete'
@@ -474,6 +478,205 @@ async function highlightJs(): Promise<string> {
 	return result.outputFiles[0].text;
 }
 
+test.describe('Code block header', () => {
+	test('is switched off in the dialog, and so is the file', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('javascript');
+		await area(page).fill(SAMPLE);
+
+		await downloadSwitch(page).click();
+		await expect(fileNameInput(page)).toBeVisible();
+		await headerSwitch(page).click();
+		await expect(downloadSwitch(page)).toBeHidden();
+		await expect(fileNameInput(page)).toBeHidden();
+		await footerButton(page, 'Insert').click();
+
+		const html = bare(await value(page));
+		expect(html).toMatch(
+			/^<div class="jodit-code" data-lang="javascript"><div class="jodit-code__body"><pre class="jodit-code__pre">/
+		);
+		expect(html).not.toContain('jodit-code__header');
+		expect(html).not.toContain('data-download');
+		await expect(page.locator('.jodit-wysiwyg .jodit-code__copy')).toHaveCount(0);
+
+		// Opened again with the header off
+		await page.locator('.jodit-wysiwyg .jodit-code__body').dblclick();
+		await expect(headerSwitch(page).locator('input')).not.toBeChecked();
+		await footerButton(page, 'Cancel').click();
+	});
+
+	test('is switched in the toolbar of the block, both ways', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await setValue(
+			page,
+			'<div class="jodit-code" data-lang="python" data-download="hello"><div class="jodit-code__header"><span class="jodit-code__lang">Python</span></div>' +
+				'<div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code nohighlight nohljsln" data-lang="python">x = 1</code></pre></div></div>'
+		);
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+
+		const button = page.locator('.jodit-popup .jodit-ui-group__code-header');
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+		await button.locator('button').click();
+		await expect(button).not.toHaveAttribute('aria-pressed', 'true');
+		let html = bare(await value(page));
+		expect(html).not.toContain('jodit-code__header');
+		// No header, no download button: the block stops offering the file
+		expect(html).not.toContain('data-download');
+
+		await button.locator('button').click();
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+		html = bare(await value(page));
+		expect(html).toContain('<span class="jodit-code__lang">Python</span>');
+	});
+
+	test('follows the header option, and a block without it gets no buttons on the site', async ({
+		page,
+		baseURL
+	}) => {
+		await openEditor(page, { buttons: BUTTONS, code: { header: false, download: true } });
+		await insertCode(page, SAMPLE);
+		const saved = await value(page);
+		expect(saved).not.toContain('jodit-code__header');
+		expect(saved).not.toContain('data-download');
+
+		await page.goto('/tests/e2e/page.html?plugins=');
+		await page.addScriptTag({ url: `${baseURL}/bundle/es2021/plugins/code/code-runtime.min.js` });
+		const buttons = await page.evaluate(html => {
+			const root = document.createElement('div');
+			root.innerHTML = html;
+			document.body.append(root);
+			(
+				window as unknown as { JoditCodeRuntime: { enhance(): number } }
+			).JoditCodeRuntime.enhance();
+			return root.querySelectorAll('button').length;
+		}, saved);
+		expect(buttons).toBe(0);
+	});
+});
+
+/** A block saved for the highlighter of the site, as the plugin writes it, without the inline styles */
+const NATIVE_JS =
+	'<div class="jodit-code" data-lang="javascript" data-native="">' +
+	'<div class="jodit-code__header"><span class="jodit-code__lang">JavaScript</span></div>' +
+	'<div class="jodit-code__body"><pre class="jodit-code__pre"><code class="language-javascript">' +
+	"class Editor {\n\tbuttons = ['code'];\n}</code></pre></div></div>";
+
+test.describe('Code block for the highlighter of the site', () => {
+	test('is saved as plain code when switched on in the dialog', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await setValue(page, '<p>Before</p>');
+		await placeCaret(page, 'p', 6);
+
+		await toolbarButton(page, 'code').click();
+		await language(page).selectOption('javascript');
+		await area(page).fill(SAMPLE);
+		await nativeSwitch(page).click();
+		await footerButton(page, 'Insert').click();
+
+		expect(bare(await value(page))).toBe(`<p>Before</p>${NATIVE_JS}<p><br></p>`);
+
+		// In the editor it is a block as any other, with its highlighting
+		const block = page.locator('.jodit-wysiwyg .jodit-code');
+		await expect(block).toHaveAttribute('data-native', '');
+		await expect(block.locator('.jodit-code__keyword').first()).toHaveText('class');
+		await expect(page.locator('.jodit-wysiwyg pre')).toHaveCount(0);
+	});
+
+	test('is switched in its toolbar, both ways', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		await page.locator('.jodit-wysiwyg .jodit-code__lang').click();
+
+		const button = page.locator('.jodit-popup .jodit-ui-group__code-native');
+		await expect(button).not.toHaveAttribute('aria-pressed', 'true');
+
+		await button.locator('button').click();
+		await expect(button).toHaveAttribute('aria-pressed', 'true');
+		await expect(page.locator('.jodit-ui-message_variant_info')).toHaveText(
+			'The block is saved as plain code for the highlighter of the site'
+		);
+		expect(bare(await value(page))).toBe(`${NATIVE_JS}<p><br></p>`);
+
+		await button.locator('button').click();
+		await expect(button).not.toHaveAttribute('aria-pressed', 'true');
+		const html = await value(page);
+		expect(html).toContain('<div class="jodit-code" data-lang="javascript" style=');
+		expect(html).toContain('var(--jodit-code-keyword');
+		expect(html).not.toContain('data-native');
+	});
+
+	test('opens saved plain code as a block and saves it the same way', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		const saved =
+			'<p>Before</p>' +
+			'<div class="jodit-code" data-lang="python" data-download="hello" data-native="">' +
+			'<div class="jodit-code__header"><span class="jodit-code__lang">Python</span></div>' +
+			'<div class="jodit-code__body"><pre class="jodit-code__lines" aria-hidden="true">1\n2</pre>' +
+			'<pre class="jodit-code__pre"><code class="language-python nohljsln">print("hi")\nx = 1</code></pre>' +
+			'</div></div>';
+		await setValue(page, saved);
+
+		const block = page.locator('.jodit-wysiwyg .jodit-code');
+		await expect(block).toHaveAttribute('data-native', '');
+		await expect(block).toHaveAttribute('data-download', 'hello');
+		await expect(block.locator('.jodit-code__lines')).toHaveText('1\n2');
+		// Highlighted in the editor
+		await expect(block.locator('code.jodit-code__code span').first()).toBeVisible();
+		expect(bare(await value(page))).toBe(saved);
+
+		// Double click opens it with its settings
+		await block.locator('.jodit-code__body').dblclick();
+		await expect(area(page)).toHaveValue('print("hi")\nx = 1');
+		await expect(nativeSwitch(page).locator('input')).toBeChecked();
+		await footerButton(page, 'Cancel').click();
+	});
+
+	test('follows the native option for new blocks', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS, code: { native: true } });
+		await insertCode(page, SAMPLE);
+		expect(bare(await value(page))).toBe(`${NATIVE_JS}<p><br></p>`);
+	});
+
+	test('is highlighted by highlight.js on the site, under its own header', async ({
+		page,
+		baseURL
+	}) => {
+		await openEditor(page, { buttons: BUTTONS, code: { native: true } });
+		await insertCode(page, SAMPLE);
+		const saved = await value(page);
+
+		const messages: string[] = [];
+		page.on('console', message => messages.push(message.text()));
+		await page.goto('/tests/e2e/page.html?plugins=');
+		await page.addScriptTag({ content: await highlightJs() });
+		await page.addScriptTag({ url: `${baseURL}/bundle/es2021/plugins/code/code-runtime.min.js` });
+
+		const site = await page.evaluate(html => {
+			const root = document.createElement('div');
+			root.innerHTML = html;
+			document.body.append(root);
+			(window as unknown as { hljs: { highlightAll(): void } }).hljs.highlightAll();
+			(
+				window as unknown as { JoditCodeRuntime: { enhance(): number } }
+			).JoditCodeRuntime.enhance();
+			return {
+				tokens: [...root.querySelectorAll('code span')].map(span => span.className),
+				header: root.querySelector('.jodit-code__lang')?.textContent,
+				copy: root.querySelectorAll('.jodit-code__copy').length,
+				text: root.querySelector('code')?.textContent
+			};
+		}, saved);
+
+		expect(site.tokens).toContain('hljs-keyword');
+		expect(site.header).toBe('JavaScript');
+		expect(site.copy).toBe(1);
+		expect(site.text).toBe(SAMPLE);
+		expect(messages).toEqual([]);
+	});
+});
+
 test.describe('Code block on a site', () => {
 	test('is left alone by highlight.js', async ({ page }) => {
 		await openEditor(page, { buttons: BUTTONS });
@@ -496,6 +699,51 @@ test.describe('Code block on a site', () => {
 		expect(messages).toEqual([]);
 	});
 
+	test('is left alone by the line numbers plugin of highlight.js when it has its own', async ({
+		page,
+		baseURL
+	}) => {
+		await openEditor(page, { buttons: BUTTONS });
+		const body = (lines: boolean) =>
+			'<div class="jodit-code__body">' +
+			(lines ? '<pre class="jodit-code__lines" aria-hidden="true">1\n2</pre>' : '') +
+			'<pre class="jodit-code__pre"><code class="language-python">x = 1\ny = 2</code></pre></div>';
+		await setValue(
+			page,
+			// Own colors and line numbers; site highlighting with and without line numbers
+			'<div class="jodit-code" data-lang="python"><div class="jodit-code__body">' +
+				'<pre class="jodit-code__lines" aria-hidden="true">1\n2</pre><pre class="jodit-code__pre">' +
+				'<code class="jodit-code__code" data-lang="python">x = 1\ny = 2</code></pre></div></div>' +
+				`<div class="jodit-code" data-lang="python" data-native="">${body(true)}</div>` +
+				`<div class="jodit-code" data-lang="python" data-native="">${body(false)}</div>`
+		);
+		const saved = await value(page);
+
+		await page.goto('/tests/e2e/page.html?plugins=');
+		await page.addScriptTag({ content: await highlightJs() });
+		await page.addScriptTag({
+			url: `${baseURL}/node_modules/highlightjs-line-numbers.js/src/highlightjs-line-numbers.js`
+		});
+
+		await page.evaluate(html => {
+			const root = document.createElement('div');
+			root.id = 'site';
+			root.innerHTML = html;
+			document.body.append(root);
+			const hljs = (
+				window as unknown as {
+					hljs: { highlightAll(): void; initLineNumbersOnLoad(): void };
+				}
+			).hljs;
+			hljs.highlightAll();
+			hljs.initLineNumbersOnLoad();
+		}, saved);
+
+		const numbered = page.locator('#site .jodit-code').filter({ has: page.locator('table.hljs-ln') });
+		await expect(numbered).toHaveCount(1);
+		await expect(page.locator('#site .jodit-code').nth(2).locator('table.hljs-ln')).toHaveCount(1);
+	});
+
 	test('gets nohighlight when a block saved before is saved again', async ({ page }) => {
 		await openEditor(page, { buttons: BUTTONS });
 		await setValue(
@@ -505,7 +753,7 @@ test.describe('Code block on a site', () => {
 		);
 
 		const html = await value(page);
-		expect(html).toContain('<code class="jodit-code__code nohighlight" data-lang="python">x = 1</code>');
+		expect(html).toContain('<code class="jodit-code__code nohighlight nohljsln" data-lang="python">x = 1</code>');
 		expect(html).not.toContain('language-python');
 	});
 });
@@ -551,6 +799,25 @@ test.describe('Code block with Jodit PRO', () => {
 		await setValue(page, '<p>Again</p>' + saved);
 		await page.waitForTimeout(500);
 		expect(await value(page)).toBe('<p>Again</p>' + saved);
+	});
+
+	test('keeps a block for the site highlighter away from the PRO code plugin', async ({
+		page
+	}) => {
+		await page.goto('/tests/e2e/page.html?plugins=code&jodit=pro');
+		await page.evaluate(html => {
+			(document.getElementById('editor') as HTMLTextAreaElement).value = html;
+			window.editor = window.Jodit.make('#editor', {
+				language: 'en',
+				toolbarAdaptive: false,
+				buttons: ['bold', 'code', 'source']
+			});
+		}, NATIVE_JS);
+		await expect(page.locator('.jodit-wysiwyg .jodit-code[data-native]')).toHaveCount(1);
+		await page.waitForTimeout(1000);
+
+		await expect(page.locator('.jodit-wysiwyg pre')).toHaveCount(0);
+		expect(bare(await value(page))).toBe(NATIVE_JS);
 	});
 
 	test('turns itself off when the PRO code button is in the toolbar', async ({

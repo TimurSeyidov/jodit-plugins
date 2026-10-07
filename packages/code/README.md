@@ -7,7 +7,7 @@
 [![Coverage](https://codecov.io/gh/TimurSeyidov/jodit-plugins/graph/badge.svg)](https://codecov.io/gh/TimurSeyidov/jodit-plugins)
 [![License: MIT](https://img.shields.io/npm/l/jodit-plugin-code)](https://github.com/TimurSeyidov/jodit-plugins/blob/main/LICENSE)
 
-Code blocks with syntax highlighting for the [Jodit](https://xdsoft.net/jodit/) editor: choose a language, paste the code, check the preview and insert. Blocks carry inline styles written as CSS variables, so they look right on any site without CSS and can be recolored with variables. Line numbers and "download as a file" are optional; copy and download buttons work in the editor, and a 2 KB runtime adds them on the site.
+Code blocks with syntax highlighting for the [Jodit](https://xdsoft.net/jodit/) editor: choose a language, paste the code, check the preview and insert. Blocks carry inline styles written as CSS variables, so they look right on any site without CSS and can be recolored with variables. Line numbers and "download as a file" are optional; copy and download buttons work in the editor, and a 2 KB runtime adds them on the site. A "Site highlighting" switch saves the code of a block as plain `<code class="language-*">` inside the same frame and header instead, for highlight.js, Prism or another highlighter of the site.
 
 ![Inserting a code block with the preview](https://timurseyidov.github.io/jodit-plugins/plugins/code/media/code.gif)
 
@@ -57,7 +57,9 @@ The browser build already contains highlight.js with the common languages.
 | `languages` | `[]` (all) | Languages offered in the dialog, as highlight.js names |
 | `defaultLanguage` | `'auto'` | Language of a new block, `'auto'` to detect it |
 | `lineNumbers` | `false` | Line numbers in a new block |
+| `header` | `true` | Header with the language and the copy and download buttons in a new block |
 | `download` | `false` | Offer the code of a new block as a file (`Untitled.<ext>` or a given name) |
+| `native` | `false` | Save the code of a new block as plain `<code class="language-*">` for the highlighter of the site, under the same header; switched per block in the dialog and its toolbar |
 | `indent` | `'\t'` | What Tab inserts in the code field |
 | `tabSize` | `4` | Width of a tab in the block |
 | `className` | `''` | CSS classes for inserted blocks |

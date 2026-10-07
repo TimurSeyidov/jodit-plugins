@@ -62,6 +62,17 @@ Object.entries({
 }).forEach(([name, value]) => editor.container.style.setProperty(name, value));
 ```
 
+## Site highlighting by default
+
+New blocks keep their frame and header, and their code is saved as plain `<code class="language-*">` for the highlighter of the site; the source view shows it. The button with the drop in the toolbar of a block switches it back to inline styles.
+
+``` { .js .jodit-demo }
+Jodit.make('#editor', {
+	buttons: ['code', '|', 'source'],
+	code: { native: true }
+});
+```
+
 ## A plain `<pre>` from pasted HTML
 
 The editor starts with a plain `<pre>`, as HTML pasted from elsewhere has it. Put the caret into it and press the code button: the dialog opens with its code and language, and "Update" turns it into a highlighted block. Then double-click the block to edit it again.

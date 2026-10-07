@@ -11,6 +11,8 @@
 - **Highlighting** by [highlight.js](https://highlightjs.org/) with 36 common languages included, automatic detection, and any other language on request.
 - **Preview** on its own tab of the dialog, exactly as the block will look.
 - **Line numbers** as an option, left out when the code is selected or copied.
+- **Header** with the language and the copy and download buttons, on or off per block.
+- **Site highlighting** as a switch per block: the code keeps its own colors in inline styles, or is saved as plain `<code class="language-*">` inside the same frame and header, for highlight.js, Prism or another highlighter of the site.
 - **Download as a file**: a block can offer its code as a file, named by you or `Untitled.<ext>`.
 - **Looks right everywhere**: every part of the block has inline styles, so it needs no CSS on the site, in an email or in a CMS.
 - **Customizable**: the colors are CSS variables and every part has a `jodit-code__*` class.
