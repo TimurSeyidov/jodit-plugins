@@ -75,6 +75,35 @@ jobs:
             npm publish --access public
           fi
 
+      # jsDelivr caches which version a range like `@1` stands for (up to 12
+      # hours on the CDN): after the release, wait until jsDelivr knows the new
+      # version and purge the URLs whose version moves with it. The package is
+      # already published, so a failure here does not fail the release.
+      - name: Refresh jsDelivr
+        continue-on-error: true
+        working-directory: packages/${{ steps.pkg.outputs.dir }}
+        run: |
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+          major="${version%%.*}"
+          minor="${version%.*}"
+
+          for i in $(seq 1 30); do
+            if curl -sf "https://data.jsdelivr.com/v1/packages/npm/$name" | grep -q "\"$version\""; then
+              break
+            fi
+            echo "Waiting for jsDelivr to see $name@$version ($i)"
+            sleep 20
+          done
+
+          find dist -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.css' \) | sort | while read -r file; do
+            for ref in "@$major" "@$minor" "@latest" ""; do
+              url="https://purge.jsdelivr.net/npm/$name$ref/$file"
+              status="$(curl -s "$url" | node -e 'let s = ""; process.stdin.on("data", d => (s += d)).on("end", () => { try { console.log(JSON.parse(s).status); } catch { console.log("error"); } })')"
+              echo "$status $name$ref/$file"
+            done
+          done
+
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

@@ -103,7 +103,7 @@ Each package is released on its own, with a tag `<dir>-v<version>`:
     git push origin <dir>-v<version>
     ```
 
-The `Publish` workflow checks that the tag matches `package.json` and that the CHANGELOG has a section for the version, runs the tests, publishes the package to npm with provenance (npm trusted publishing) and makes a GitHub release with that section as its notes.
+The `Publish` workflow checks that the tag matches `package.json` and that the CHANGELOG has a section for the version, runs the tests, publishes the package to npm with provenance (npm trusted publishing), purges the jsDelivr cache of the URLs that follow the new version (`@<major>`, `@<major>.<minor>`, `@latest` and no version), so CDN links like `jodit-plugin-code@1` serve it right away, and makes a GitHub release with that section as its notes.
 
 ## License
 
