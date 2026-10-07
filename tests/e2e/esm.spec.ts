@@ -63,6 +63,7 @@ test.describe('ES module', () => {
 				qrcode: Boolean(Jodit.plugins.get('qrcode')),
 				mailto: Boolean(Jodit.plugins.get('mailto')),
 				code: Boolean(Jodit.plugins.get('code')),
+				shortlink: Boolean(Jodit.plugins.get('shortlink')),
 				sameLinkControl: Jodit.defaultOptions.controls.link === before
 			};
 		});
@@ -71,6 +72,7 @@ test.describe('ES module', () => {
 			qrcode: true,
 			mailto: true,
 			code: true,
+			shortlink: true,
 			sameLinkControl: true
 		});
 	});

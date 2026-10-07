@@ -16,6 +16,20 @@ test.describe('Builds', () => {
 		});
 	}
 
+	for (const build of ['es2015', 'es2018', 'es2021']) {
+		test(`${build}: the link shortener adds its button to the link form`, async ({
+			page
+		}) => {
+			const errors: string[] = [];
+			page.on('pageerror', error => errors.push(error.message));
+
+			await openEditor(page, { buttons: ['link'] }, { build, plugins: ['shortlink'] });
+			await toolbarButton(page, 'link').click();
+			await expect(page.locator('.jodit-popup .jodit-shortlink-field button')).toBeVisible();
+			expect(errors).toEqual([]);
+		});
+	}
+
 	test('extraPlugins loads the plugins from basePath', async ({ page }) => {
 		const requests: string[] = [];
 		page.on('request', request => {

@@ -65,6 +65,61 @@ async function caretToEnd(page) {
 }
 
 const scenarios = {
+	async shortlink(page) {
+		// The services answer from here: the recording does not depend on the network
+		const shorts = { 'da.gd': 'https://da.gd/Rk7sQ', 'clck.ru': 'https://clck.ru/3FpWq' };
+		for (const [host, short] of Object.entries(shorts)) {
+			await page.route(`https://${host}/**`, route =>
+				route.fulfill({ body: short, headers: { 'access-control-allow-origin': '*' } })
+			);
+		}
+
+		const docs =
+			'https://timurseyidov.github.io/jodit-plugins/plugins/shortlink/options/#services';
+		await page.evaluate(docs => {
+			window.editor.value =
+				'<p>See the release notes before you update.</p>' +
+				`<p>Docs: <a href="${docs}">${docs}</a></p>`;
+		}, docs);
+		await pause(600);
+
+		// The link form: paste a long URL, shorten it, insert
+		await page.evaluate(() => {
+			const text = window.editor.editor.querySelector('p').firstChild;
+			const range = document.createRange();
+			range.setStart(text, 'See '.length);
+			range.setEnd(text, 'See the release notes'.length);
+			window.editor.s.selectRange(range);
+		});
+		await pause(500);
+		await click(page, page.locator('.jodit-toolbar-button_link button'));
+		await pause(400);
+		const url = page.locator('.jodit-popup input[data-ref="url_input"]');
+		await click(page, url);
+		await page.keyboard.type(
+			'https://github.com/TimurSeyidov/jodit-plugins/releases?q=shortlink&expanded=true',
+			{ delay: 12 }
+		);
+		await pause(500);
+		await click(page, page.locator('.jodit-popup .jodit-shortlink-field button'));
+		await pause(1200);
+		await click(page, page.locator('.jodit-popup button[type=submit]'));
+		await pause(900);
+
+		// An existing link, from its toolbar with another service: the URL text follows
+		await click(page, page.locator('.jodit-wysiwyg a').nth(1));
+		await pause(700);
+		await click(
+			page,
+			page.locator('.jodit-popup .jodit-ui-group__shortlink .jodit-toolbar-button__trigger')
+		);
+		await pause(700);
+		await click(page, page.locator('.jodit-popup .jodit-toolbar-button', { hasText: /^clck\.ru$/ }));
+		await pause(1800);
+		await click(page, page.locator('.jodit-toolbar-button_source button'));
+		await pause(2200);
+	},
+
 	async code(page, size) {
 		await page.evaluate(() => {
 			window.editor.value = '<p>Greet a user by name:</p>';
@@ -217,6 +272,14 @@ const SETUP = {
 			buttons: ['bold', 'italic', '|', 'link', 'image', 'qrcode']
 		}
 	},
+	shortlink: {
+		size: { width: 760, height: 460 },
+		plugins: ['shortlink'],
+		options: {
+			height: 400,
+			buttons: ['bold', 'italic', '|', 'link', '|', 'source']
+		}
+	},
 	mailto: {
 		size: { width: 760, height: 620 },
 		options: {
@@ -227,7 +290,7 @@ const SETUP = {
 };
 
 async function record(browser, name) {
-	const { size, options } = SETUP[name];
+	const { size, options, plugins } = SETUP[name];
 	const videoDir = mkdtempSync(join(tmpdir(), `gif-${name}-`));
 	const context = await browser.newContext({
 		viewport: size,
@@ -237,7 +300,10 @@ async function record(browser, name) {
 	await context.addInitScript(CURSOR);
 
 	const page = await context.newPage();
-	await page.goto(`http://127.0.0.1:${PORT}/tests/e2e/page.html`);
+	await page.goto(
+		`http://127.0.0.1:${PORT}/tests/e2e/page.html` +
+			(plugins ? `?plugins=${plugins.join(',')}` : '')
+	);
 	await page.addStyleTag({
 		content: 'body { margin: 24px; background: #fff; }'
 	});

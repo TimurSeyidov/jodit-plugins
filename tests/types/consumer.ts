@@ -12,15 +12,36 @@ import {
 	type MailtoOptions
 } from 'jodit-plugin-mailto';
 import { registerQrCode, type QrCodeOptions } from 'jodit-plugin-qrcode';
+import {
+	registerShortlink,
+	shorten,
+	ShortlinkError,
+	type ShortlinkOptions
+} from 'jodit-plugin-shortlink';
 
 registerQrCode(Jodit);
 registerMailto(Jodit);
+registerShortlink(Jodit);
 
 // The plugins add their options to the options of Jodit.make()
 Jodit.make('#editor', {
 	code: { lineNumbers: true, languages: ['python', 'sql'], indent: '  ' },
 	qrcode: { size: 300, format: 'svg', errorCorrectionLevel: 'H' },
-	mailto: { fields: { bcc: false, body: 'main' }, required: { subject: true } }
+	mailto: { fields: { bcc: false, body: 'main' }, required: { subject: true } },
+	shortlink: { service: 'clck', timeout: 5000 }
+});
+
+// A function as the service
+Jodit.make('#editor', {
+	shortlink: {
+		service: async (url: string, signal: AbortSignal) => {
+			const response = await fetch(`/shorten?url=${encodeURIComponent(url)}`, { signal });
+			if (!response.ok) {
+				throw new ShortlinkError('Our shortener is down');
+			}
+			return response.text();
+		}
+	}
 });
 
 // @ts-expect-error: unknown image format
@@ -58,3 +79,6 @@ export const block: string = renderBlock('x = 1', 'python', {
 }).html;
 export const enhanced: number = enhance(document, { label: 'Copy' });
 export { registerLanguage };
+
+const shortlink: ShortlinkOptions = Jodit.defaultOptions.shortlink;
+export const short: Promise<string> = shorten('https://example.com/', shortlink);
