@@ -4,6 +4,8 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-07
+
 ### Added
 
 - Works next to Jodit PRO: when the `pasteCode` button is in the toolbar, the plugin turns itself off in that editor with a warning in the console; without the button both plugins work, and Jodit PRO no longer repaints the blocks, opens its dialog or popup for them, or strips their highlighting from the saved HTML.
@@ -36,6 +38,7 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 - English, German and Russian.
 - ES module for bundlers, and browser builds for ES2015, ES2018 and ES2021 with highlight.js included, for a `<script>` tag or `extraPlugins`.
 
-[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.1.0...HEAD
+[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.2.0...HEAD
+[1.2.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.1.0...code-v1.2.0
 [1.1.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.0.0...code-v1.1.0
 [1.0.0]: https://github.com/TimurSeyidov/jodit-plugins/releases/tag/code-v1.0.0
