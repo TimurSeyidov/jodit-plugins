@@ -6,9 +6,8 @@ Settings go into the `shortlink` option of the editor. Every key is optional; th
 Jodit.make('#editor', {
 	shortlink: {
 		service: 'dagd',
-		services: { dagd: true, clck: true, cleanuri: false },
+		services: { dagd: true, clck: true },
 		remember: true,
-		proxy: '',
 		timeout: 10000,
 		replaceText: true
 	}
@@ -17,10 +16,9 @@ Jodit.make('#editor', {
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `service` | `'dagd'`, `'clck'`, `'cleanuri'` or a function | `'dagd'` | The service that makes the short links, see below; with a choice, the one chosen at first |
+| `service` | `'dagd'`, `'clck'` or a function | `'dagd'` | The service that makes the short links, see below; with a choice, the one chosen at first |
 | `services` | object | da.gd and clck.ru | The services the user chooses from, see [Choice of the service](#choice-of-the-service) |
 | `remember` | `boolean` | `true` | Remember the chosen service in the browser |
-| `proxy` | `string` | `''` | Address on your site that forwards the requests of `'cleanuri'` |
 | `timeout` | `number` | `10000` | Time to wait for the service, in milliseconds |
 | `replaceText` | `boolean` | `true` | When the text of a link is its URL, put the short link into the text too |
 
@@ -30,9 +28,8 @@ Jodit.make('#editor', {
 | --- | --- | --- | --- |
 | `'dagd'` | `https://da.gd/…` | `GET https://da.gd/s?url=…` | Works from any site |
 | `'clck'` | `https://clck.ru/…` | `GET https://clck.ru/--?url=…` | Works from any site; the service of Yandex |
-| `'cleanuri'` | `https://cleanuri.com/…` | `POST` to `proxy` | Needs a proxy, see below |
 
-A browser can read the answer of a service only when the service allows it with CORS headers. da.gd and clck.ru do; cleanuri.com does not, so its requests go to an address on your site that forwards them.
+Both answer requests from any site: their answers carry CORS headers, which a browser needs to read them. A service without such headers, or one that needs a key, can be used through your own server as a [function](#your-own-service).
 
 ## Choice of the service
 
@@ -47,39 +44,17 @@ Jodit.make('#editor', {
 		services: {
 			dagd: true,
 			clck: true,
-			cleanuri: true,
 			ours: { title: 'go.example.com', service: url => ourShortener(url) }
-		},
-		proxy: '/api/shorten'
+		}
 	}
 });
 ```
 
 It is an object rather than a list, so that one key can be changed without repeating the others: `services: { clck: false }` keeps da.gd only.
 
-There is no choice when fewer than two services are offered, or when `service` is not one of them: then `service` is the only service. So `service: 'cleanuri'` or `service: myFunction` alone keeps working without a list; to offer your function next to the others, put the same function in `services` too.
+There is no choice when fewer than two services are offered, or when `service` is not one of them: then `service` is the only service. So `service: myFunction` alone keeps working without a list; to offer your function next to the others, put the same function in `services` too.
 
-### A proxy for cleanuri.com
-
-The plugin posts `url=<long URL>` as a form to `proxy` and expects the answer of cleanuri.com: `{"result_url": "…"}` or `{"error": "…"}`. The proxy forwards the request as it is, for example in Node.js with Express:
-
-```js
-app.post('/api/shorten', express.urlencoded({ extended: false }), async (request, response) => {
-	const answer = await fetch('https://cleanuri.com/api/v1/shorten', {
-		method: 'POST',
-		body: new URLSearchParams({ url: String(request.body.url ?? '') })
-	});
-	response.status(answer.status).type('json').send(await answer.text());
-});
-```
-
-```js
-Jodit.make('#editor', {
-	shortlink: { service: 'cleanuri', proxy: '/api/shorten' }
-});
-```
-
-### Your own service
+## Your own service
 
 `service` can be a function that takes the long URL and an `AbortSignal` and returns the short link. The signal aborts the request after `timeout`. To show your own message, throw a `ShortlinkError`; any other error is shown as "The link shortening service is not available".
 
@@ -120,7 +95,7 @@ When a link cannot be shortened, the editor shows an error message for five seco
 | The link shortening service did not answer in time | No answer within `timeout` |
 | The link shortening service gave an unexpected answer | The answer is not a link |
 
-A link that is already short (da.gd, clck.ru or cleanuri.com) is not sent again; the editor says "The link is already short".
+A link that is already short (da.gd or clck.ru) is not sent again; the editor says "The link is already short".
 
 ## Shortening outside the editor
 
@@ -131,7 +106,6 @@ import { shorten } from 'jodit-plugin-shortlink';
 
 const short = await shorten('https://example.com/a/long/path', {
 	service: 'dagd',
-	proxy: '',
 	timeout: 10000
 });
 ```

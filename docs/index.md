@@ -9,7 +9,7 @@ Plugins for the [Jodit](https://xdsoft.net/jodit/) WYSIWYG editor. Each plugin i
 | [Code block](plugins/code/index.md) | `jodit-plugin-code` | Inserts code blocks with syntax highlighting, a preview, optional line numbers and a copy button on the site |
 | [Email link](plugins/mailto/index.md) | `jodit-plugin-mailto` | Inserts `mailto:` links with To, Cc, Bcc, Subject and Body; required fields are configurable |
 | [QR code](plugins/qrcode/index.md) | `jodit-plugin-qrcode` | Inserts QR codes for any text or link, with a live preview and editing of inserted codes |
-| [Short links](plugins/shortlink/index.md) | `jodit-plugin-shortlink` | Shortens links in the link form and the link toolbar with da.gd, clck.ru, cleanuri.com or your own service |
+| [Short links](plugins/shortlink/index.md) | `jodit-plugin-shortlink` | Shortens links in the link form and the link toolbar with da.gd, clck.ru or your own service |
 
 ## Ways to connect a plugin
 

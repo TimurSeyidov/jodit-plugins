@@ -13,7 +13,6 @@ const LONG = 'https://example.com/a/very/long/path?with=query&and=more';
 
 const options = (changes: Partial<ShortenOptions> = {}): ShortenOptions => ({
 	service: 'dagd',
-	proxy: '',
 	timeout: 1000,
 	...changes
 });
@@ -46,33 +45,14 @@ describe('shorten', () => {
 		);
 	});
 
-	it('posts to cleanuri.com, or to the proxy', async () => {
-		const fetcher = answer('{"result_url":"https:\\/\\/cleanuri.com\\/KGM9p7"}');
-
-		await expect(shorten(LONG, options({ service: 'cleanuri' }), fetcher)).resolves.toBe(
-			'https://cleanuri.com/KGM9p7'
-		);
-		const [url, init] = fetcher.mock.calls[0];
-		expect(String(url)).toBe('https://cleanuri.com/api/v1/shorten');
-		expect(init?.method).toBe('POST');
-		expect(String(init?.body)).toBe(`url=${encodeURIComponent(LONG)}`);
-
-		await shorten(LONG, options({ service: 'cleanuri', proxy: '/shorten' }), fetcher);
-		expect(String(fetcher.mock.calls[1][0])).toBe('/shorten');
-	});
-
 	it('passes on the error text of a service', async () => {
 		await expect(
 			shorten(LONG, options(), answer('Long URL must have http:// or https:// scheme.', 400))
 		).rejects.toThrow(new ShortlinkError('Long URL must have http:// or https:// scheme.'));
 
 		await expect(
-			shorten(
-				LONG,
-				options({ service: 'cleanuri' }),
-				answer('{"error":"API Error: URL is invalid (check #1)"}')
-			)
-		).rejects.toThrow('API Error: URL is invalid (check #1)');
+			shorten(LONG, options({ service: 'clck' }), answer('Domain should be at least of length 2', 400))
+		).rejects.toThrow('Domain should be at least of length 2');
 	});
 
 	it('uses a function as the service', async () => {
@@ -152,7 +132,6 @@ describe('isHttpUrl and isShortUrl', () => {
 		expect(isHttpUrl('ftp://example.com')).toBe(false);
 		expect(isShortUrl('https://da.gd/abc')).toBe(true);
 		expect(isShortUrl('https://clck.ru/abc')).toBe(true);
-		expect(isShortUrl('https://cleanuri.com/abc')).toBe(true);
 		expect(isShortUrl(LONG)).toBe(false);
 		expect(isShortUrl('not a url')).toBe(false);
 	});

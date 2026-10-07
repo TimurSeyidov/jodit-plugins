@@ -30,7 +30,7 @@ describe('offeredServices', () => {
 	});
 
 	it('offers nothing when the service is not one of the services', () => {
-		expect(offeredServices(options({ service: 'cleanuri' }))).toEqual([]);
+		expect(offeredServices(options({ service: 'clck', services: { dagd: true } }))).toEqual([]);
 		expect(offeredServices(options({ service: own }))).toEqual([]);
 	});
 });
@@ -46,9 +46,9 @@ describe('chosenService', () => {
 	});
 
 	it('takes the service option when there is no choice', () => {
-		expect(chosenService(options({ service: 'cleanuri' }), 'da.gd')).toEqual({
-			title: 'cleanuri.com',
-			service: 'cleanuri'
+		expect(chosenService(options({ service: 'clck', services: { dagd: true } }), 'da.gd')).toEqual({
+			title: 'clck.ru',
+			service: 'clck'
 		});
 		expect(chosenService(options({ service: own })).service).toBe(own);
 	});

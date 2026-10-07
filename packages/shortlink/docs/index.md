@@ -11,7 +11,7 @@
 - **In the link form**: a "Shorten" button next to the URL field replaces the URL with the short link. Check it, then press "Insert" as usual.
 - **On an existing link**: click the link, and the "Shorten link" button in its toolbar changes it in place.
 - **The text follows the link**: when the text of a link is its URL, it becomes the short link too; other text stays.
-- **Services**: [da.gd](https://da.gd/) and [clck.ru](https://clck.ru/) to choose from by default, [cleanuri.com](https://cleanuri.com/) through a proxy on your site, or your own service as a function.
+- **Services**: [da.gd](https://da.gd/) and [clck.ru](https://clck.ru/) to choose from, or your own service as a function.
 - **Choice right there**: a list next to the "Shorten" button in the form and an arrow on the button in the link toolbar; the choice is remembered in the browser.
 - **Clear errors**: the message of the service, or why the request failed (no connection, no answer in time, not an http(s) link), in the language of the editor.
 - **No toolbar button of its own**: the plugin adds to the link UI of Jodit and gets along with the [email link](../mailto/index.md) plugin.

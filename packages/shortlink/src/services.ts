@@ -2,12 +2,11 @@
 export type ShortlinkProvider = (url: string, signal: AbortSignal) => Promise<string>;
 
 /** A built-in service */
-export type ShortlinkServiceName = 'dagd' | 'clck' | 'cleanuri';
+export type ShortlinkServiceName = 'dagd' | 'clck';
 
 /** Options of a request, see `ShortlinkOptions` */
 export interface ShortenOptions {
 	service: ShortlinkServiceName | ShortlinkProvider;
-	proxy: string;
 	timeout: number;
 }
 
@@ -25,7 +24,7 @@ export const MESSAGES = {
 } as const;
 
 /** Hosts of the short links of the built-in services */
-export const SHORT_HOSTS = ['da.gd', 'clck.ru', 'cleanuri.com'];
+export const SHORT_HOSTS = ['da.gd', 'clck.ru'];
 
 type Fetch = typeof fetch;
 
@@ -40,35 +39,12 @@ async function plainText(response: Response): Promise<string> {
 	return text;
 }
 
-const SERVICES: Record<ShortlinkServiceName, (fetcher: Fetch, proxy: string) => ShortlinkProvider> = {
+const SERVICES: Record<ShortlinkServiceName, (fetcher: Fetch) => ShortlinkProvider> = {
 	dagd: fetcher => async (url, signal) =>
 		plainText(await fetcher(`https://da.gd/s?url=${encodeURIComponent(url)}`, { signal })),
 
 	clck: fetcher => async (url, signal) =>
-		plainText(await fetcher(`https://clck.ru/--?url=${encodeURIComponent(url)}`, { signal })),
-
-	// No CORS headers: a browser can read the answer only through a proxy on the site
-	cleanuri: (fetcher, proxy) => async (url, signal) => {
-		const response = await fetcher(proxy || 'https://cleanuri.com/api/v1/shorten', {
-			method: 'POST',
-			body: new URLSearchParams({ url }),
-			signal
-		});
-		const data = (await response.json().catch(() => null)) as {
-			result_url?: unknown;
-			error?: unknown;
-		} | null;
-
-		if (typeof data?.error === 'string' && data.error) {
-			throw new ShortlinkError(data.error);
-		}
-
-		if (!response.ok) {
-			throw new ShortlinkError(MESSAGES.unavailable);
-		}
-
-		return typeof data?.result_url === 'string' ? data.result_url : '';
-	}
+		plainText(await fetcher(`https://clck.ru/--?url=${encodeURIComponent(url)}`, { signal }))
 };
 
 /** `url` is an absolute http:// or https:// link */
@@ -112,7 +88,7 @@ export async function shorten(
 	const provider =
 		typeof options.service === 'function'
 			? options.service
-			: SERVICES[options.service]?.(fetcher, options.proxy);
+			: SERVICES[options.service]?.(fetcher);
 
 	if (!provider) {
 		throw new ShortlinkError(MESSAGES.unavailable);

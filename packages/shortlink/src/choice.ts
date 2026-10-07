@@ -4,8 +4,7 @@ import type { ShortlinkServiceName } from './services.js';
 /** Names of the built-in services in the list */
 export const TITLES: Record<ShortlinkServiceName, string> = {
 	dagd: 'da.gd',
-	clck: 'clck.ru',
-	cleanuri: 'cleanuri.com'
+	clck: 'clck.ru'
 };
 
 type ChoiceOptions = Pick<ShortlinkOptions, 'service' | 'services'>;
