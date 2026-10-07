@@ -4,6 +4,15 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+### Added
+
+- Works next to Jodit PRO: when the `pasteCode` button is in the toolbar, the plugin turns itself off in that editor with a warning in the console; without the button both plugins work, and Jodit PRO no longer repaints the blocks, opens its dialog or popup for them, or strips their highlighting from the saved HTML.
+
+### Changed
+
+- `<code>` of a block has the `nohighlight` class in place of `language-*`, so highlight.js and Prism on a site skip the blocks: no repainting and no highlight.js warnings. Blocks saved before get it when saved again.
+- In the editor a block holds its code and line numbers in `<div>` elements instead of `<pre>`; the saved HTML is unchanged.
+
 ## [1.1.0] - 2026-10-07
 
 ### Added

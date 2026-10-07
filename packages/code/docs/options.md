@@ -53,13 +53,14 @@ A block is saved as HTML like this (inline styles shortened):
 	<div class="jodit-code__body" style="…">
 		<pre class="jodit-code__lines" aria-hidden="true" style="…">1
 2</pre>
-		<pre class="jodit-code__pre" style="…"><code class="jodit-code__code language-javascript" data-lang="javascript" style="…"><span class="jodit-code__keyword" style="color:var(--jodit-code-keyword,#cf222e)">const</span> a = 1;
+		<pre class="jodit-code__pre" style="…"><code class="jodit-code__code nohighlight" data-lang="javascript" style="…"><span class="jodit-code__keyword" style="color:var(--jodit-code-keyword,#cf222e)">const</span> a = 1;
 …</code></pre>
 	</div>
 </div>
 ```
 
-- `data-lang` on the block and on `<code>` holds the language; `language-<name>` is the class other tools (highlight.js, Prism, Markdown converters) look for.
+- `data-lang` on the block and on `<code>` holds the language.
+- `<code>` has the `nohighlight` class and no `language-*` class on purpose: highlight.js and Prism on the site skip the block, see [Next to other code tools](#next-to-other-code-tools).
 - `jodit-code__lines` is there only with line numbers.
 - `data-download` is there only when the block offers its code as a file; its value is the file name, empty for `Untitled.<ext>`.
 - The code itself is the text of `<code>`: the plugin reads it from there when the block is edited, so no other data is stored.
@@ -81,9 +82,31 @@ The header of the block gets a download button next to the copy button, in the e
 - **Double-click** a block to open the dialog with its code, language, line numbers and file settings.
 - **Click** a block to select it and show its toolbar: the language (choose another one to highlight the code again), line numbers on and off, edit, copy the code, delete. The language list is the one of the dialog, see `languages`. Delete and Backspace remove a selected block.
 - The **copy and download buttons** in the header of a block work in the editor too; they are added in the editor only and are not saved with the HTML.
-- With the caret inside a plain `<pre>` (for example from pasted HTML), the code button opens the dialog with its text, and "Update" turns it into a highlighted block. The language is taken from a `language-*` or `lang-*` class if there is one.
+- With the caret inside a plain `<pre>` (for example from pasted HTML), the code button opens the dialog with its text, and "Update" turns it into a highlighted block. The language is taken from a `language-*` or `lang-*` class if there is one. With Jodit PRO, plain `<pre>` blocks are left to its code plugin.
 
 In the editor a block cannot be edited in place: changes go through the dialog, so the highlighting always matches the code.
+
+## Next to other code tools
+
+### highlight.js or Prism on the site
+
+A block brings its highlighting with it, so a site needs no highlighter for it. When the site has one anyway, it skips the blocks: `<code>` has the `nohighlight` class and no `language-*` class, which is how highlight.js and Prism decide what to highlight. The blocks keep their look, and highlight.js logs no warnings about them. Code that the site highlights itself, such as `<pre><code class="language-js">`, is not affected.
+
+Blocks saved by version 1.1 and earlier have a `language-*` class; they get `nohighlight` when they are saved again.
+
+### Jodit PRO
+
+Jodit PRO has its own code plugin, `pasteCode`, with the `pasteCode` button.
+
+- **The `pasteCode` button is in the toolbar**: this plugin turns itself off in that editor, leaving code blocks to Jodit PRO, and says so in the console:
+
+    ```text
+    jodit-plugin-code: the "pasteCode" button of Jodit PRO is in the toolbar, so the code plugin is off in this editor
+    ```
+
+    The `code` button, if it is in the toolbar too, is disabled. To use this plugin instead, remove `pasteCode` from the buttons or add it to `disablePlugins`.
+
+- **Jodit PRO without the `pasteCode` button**: both plugins work. Blocks of this plugin keep their highlighting, toolbar and dialog; plain `<pre>` blocks belong to Jodit PRO. In the editor a block holds its code in `<div>` elements, so Jodit PRO does not take it for its own; the saved HTML has `<pre>` as usual.
 
 ## Translations
 

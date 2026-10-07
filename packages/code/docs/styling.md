@@ -55,7 +55,7 @@ Without any CSS the default (`#cf222e`) is used. To change it, set the variable 
 | `jodit-code__download` | Download button of a block offered as a file |
 | `jodit-code__body` | Line numbers and code |
 | `jodit-code__lines` | Line numbers |
-| `jodit-code__pre`, `jodit-code__code` | `<pre>` and `<code>` |
+| `jodit-code__pre`, `jodit-code__code` | `<pre>` and `<code>`; in the editor `jodit-code__pre` and `jodit-code__lines` are `<div>`, so select them by class |
 | `jodit-code__<kind>` | Tokens: `keyword`, `string`, `number`, `comment`, `title`, `type`, `attr`, `tag`, `variable`, `meta`, `regexp`, `addition`, `deletion`; other highlight.js scopes keep their name, such as `jodit-code__params` |
 
 Classes are the way to change what is not a variable, such as paddings or the font size. Inline styles win over classes, so such rules need `!important`:

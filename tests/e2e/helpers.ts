@@ -27,16 +27,19 @@ export interface PageOptions {
 
 	/** Plugins loaded with a <script> tag; an empty list loads none */
 	plugins?: string[];
+
+	/** Load Jodit PRO with all its plugins instead of Jodit */
+	pro?: boolean;
 }
 
 /** Opens the test page and creates `window.editor` with `options` */
 export async function openEditor(
 	page: Page,
 	options: Record<string, unknown> = {},
-	{ build = 'es2021', plugins = ['qrcode', 'mailto', 'code'] }: PageOptions = {}
+	{ build = 'es2021', plugins = ['qrcode', 'mailto', 'code'], pro = false }: PageOptions = {}
 ): Promise<void> {
 	await page.goto(
-		`/tests/e2e/page.html?build=${build}&plugins=${plugins.join(',')}`
+		`/tests/e2e/page.html?build=${build}&plugins=${plugins.join(',')}${pro ? '&jodit=pro' : ''}`
 	);
 
 	await page.evaluate(options => {

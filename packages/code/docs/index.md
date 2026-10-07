@@ -16,6 +16,7 @@
 - **Customizable**: the colors are CSS variables and every part has a `jodit-code__*` class.
 - **Copy and download buttons** in the header of the block: in the editor, and on the site from a 2 KB runtime script.
 - **Editing**: double-click a block, or click it and use its toolbar to change the language, switch line numbers, edit, copy or delete it. Plain `<pre>` blocks become highlighted blocks when edited.
+- **Gets along with other tools**: highlight.js or Prism on the site leave the blocks alone, and next to Jodit PRO the plugin steps aside when the PRO code button is in the toolbar. See [Next to other code tools](options.md#next-to-other-code-tools).
 - **Translations**: English, German and Russian.
 
 ## Try it

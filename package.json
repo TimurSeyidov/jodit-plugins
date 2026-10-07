@@ -26,6 +26,7 @@
 		"@vitest/coverage-v8": "^5.0.3",
 		"esbuild": "^0.28.2",
 		"jodit": "4.17.1",
+		"jodit-pro": "4.17.2",
 		"monocart-coverage-reports": "^2.13.1",
 		"typescript": "^5.9.0",
 		"vitest": "^5.0.3"

@@ -16,7 +16,7 @@ import icon from './icon.svg';
 import lineNumbersIcon from './line-numbers.svg';
 import { langs } from './langs/index.js';
 import { defaultOptions } from './options.js';
-import { findBlock, readBlock, unlockValue } from './parse.js';
+import { findBlock, lockValue, readBlock, unlockValue } from './parse.js';
 import type { BlockData } from './parse.js';
 import { renderBlock } from './render.js';
 
@@ -55,6 +55,12 @@ let lastLanguage: string | null = null;
 
 const registered = new WeakSet<JoditStatic>();
 
+/** Code block plugin of Jodit PRO */
+const PRO_PLUGIN = 'pasteCode';
+
+/** Editors where the plugin is off because the code button of Jodit PRO is in the toolbar */
+const yielded = new WeakSet<IJodit>();
+
 /**
  * Registers the code block plugin, its toolbar button, icon, inline toolbar, default options and translations in the
  * given Jodit class. Calling it again for the same class does nothing.
@@ -78,9 +84,12 @@ export function registerCode(Jodit: JoditStatic): void {
 		icon: NAME,
 		tooltip: 'Insert code',
 		isActive: (editor: IJodit) =>
-			Boolean(findBlock(editor.s.current(), editor.editor)),
+			Boolean(currentBlock(Jodit, editor)),
+		isDisabled: (editor: IJodit) => yielded.has(editor),
 		exec: (editor: IJodit) => {
-			openDialog(Jodit, editor, findBlock(editor.s.current(), editor.editor));
+			if (!yielded.has(editor)) {
+				openDialog(Jodit, editor, currentBlock(Jodit, editor));
+			}
 		}
 	} as IControlType;
 
@@ -159,11 +168,35 @@ export function registerCode(Jodit: JoditStatic): void {
 	});
 
 	class CodePlugin extends Jodit.modules.Plugin {
-		override buttons = [{ name: NAME, group: 'insert' as const }];
+		/** The code button of Jodit PRO is in the toolbar: this plugin does nothing in the editor */
+		private readonly off = proButtonInToolbar(Jodit, this.jodit as IJodit);
+
+		override buttons = this.off ? [] : [{ name: NAME, group: 'insert' as const }];
 
 		override styles = STYLES;
 
+		constructor(editor: IJodit) {
+			super(editor);
+
+			if (this.off) {
+				yielded.add(editor);
+				return;
+			}
+
+			// Before the first value gets into the editor, Jodit PRO included
+			editor.e.on('beforeSetNativeEditorValue.code', (data: { value: string }) => {
+				data.value = lockValue(data.value);
+			});
+		}
+
 		protected afterInit(editor: IJodit): void {
+			if (this.off) {
+				console.warn(
+					`jodit-plugin-code: the "${PRO_PLUGIN}" button of Jodit PRO is in the toolbar, so the code plugin is off in this editor`
+				);
+				return;
+			}
+
 			const lock = editor.async.debounce(
 				() => lockBlocks(Jodit, editor),
 				editor.defaultTimeout
@@ -252,9 +285,58 @@ function lockBlocks(Jodit: JoditStatic, editor: IJodit): void {
 	editor.editor
 		.querySelectorAll<HTMLElement>('.jodit-code')
 		.forEach(block => {
+			// A block that came in another way than the value, for example pasted
+			block
+				.querySelectorAll<HTMLElement>(
+					':scope > .jodit-code__body > pre.jodit-code__pre, :scope > .jodit-code__body > pre.jodit-code__lines'
+				)
+				.forEach(pre => pre.replaceWith(editor.createInside.fromHTML(lockValue(pre.outerHTML))));
 			block.setAttribute('contenteditable', 'false');
 			addButtons(block, labels(editor), true);
 		});
+}
+
+/** The block of the caret; a plain `<pre>` only when Jodit PRO does not handle them */
+function currentBlock(Jodit: JoditStatic, editor: IJodit): HTMLElement | null {
+	return findBlock(
+		editor.s.current(),
+		editor.editor,
+		!pluginEnabled(Jodit, editor, PRO_PLUGIN)
+	);
+}
+
+/** The plugin is registered and not in `disablePlugins` of the editor */
+function pluginEnabled(Jodit: JoditStatic, editor: IJodit, name: string): boolean {
+	const normalize = (value: string): string =>
+		value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').replace(/[\s_]+/g, '-').toLowerCase();
+	const disabled = editor.o.disablePlugins;
+	const list = (Array.isArray(disabled) ? disabled : String(disabled ?? '').split(/[,\s]+/))
+		.filter(Boolean)
+		.map(normalize);
+
+	return Boolean(Jodit.plugins.get(name)) && !list.includes(normalize(name));
+}
+
+/** The code button of Jodit PRO is enabled and in one of the toolbars of the editor */
+function proButtonInToolbar(Jodit: JoditStatic, editor: IJodit): boolean {
+	if (!pluginEnabled(Jodit, editor, PRO_PLUGIN)) {
+		return false;
+	}
+
+	const has = (items: unknown): boolean =>
+		Array.isArray(items)
+			? items.some(has)
+			: typeof items === 'string'
+				? items.split(/[,\s]+/).includes(PRO_PLUGIN)
+				: Boolean(
+						items &&
+							typeof items === 'object' &&
+							((items as { name?: unknown }).name === PRO_PLUGIN ||
+								has((items as { buttons?: unknown }).buttons))
+					);
+	const options = editor.o as unknown as Record<string, unknown>;
+
+	return ['buttons', 'buttonsMD', 'buttonsSM', 'buttonsXS'].some(key => has(options[key]));
 }
 
 /** Labels of the block buttons in the language of the editor */
@@ -358,7 +440,7 @@ function rerenderBlock(
 	});
 
 	// The block stays the same element: it is the target of the open inline toolbar
-	const next = editor.createInside.fromHTML(html) as HTMLElement;
+	const next = editor.createInside.fromHTML(lockValue(html)) as HTMLElement;
 	[...block.attributes].forEach(({ name }) => block.removeAttribute(name));
 	[...next.attributes].forEach(({ name, value }) => block.setAttribute(name, value));
 	block.replaceChildren(...next.childNodes);
@@ -598,7 +680,7 @@ function indent(area: HTMLTextAreaElement, unit: string, outdent: boolean): void
 function insertBlock(editor: IJodit, html: string, target: HTMLElement | null): void {
 	editor.s.restore();
 
-	const block = editor.createInside.fromHTML(html) as HTMLElement;
+	const block = editor.createInside.fromHTML(lockValue(html)) as HTMLElement;
 
 	if (target && editor.editor.contains(target)) {
 		target.replaceWith(block);

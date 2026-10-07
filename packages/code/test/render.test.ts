@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { extensionOf, fileName } from '../src/filename';
 import { listLanguages, registerLanguage } from '../src/highlight';
-import { unlockValue } from '../src/parse';
+import { lockValue, noHighlight, unlockValue } from '../src/parse';
 import { normalizeCode, renderBlock } from '../src/render';
 
 /** HTML without the inline styles, for readable expectations */
@@ -17,7 +17,7 @@ describe('renderBlock', () => {
 			'<div class="jodit-code" data-lang="javascript">' +
 				'<div class="jodit-code__header"><span class="jodit-code__lang">JavaScript</span></div>' +
 				'<div class="jodit-code__body"><pre class="jodit-code__pre">' +
-				'<code class="jodit-code__code language-javascript" data-lang="javascript">' +
+				'<code class="jodit-code__code nohighlight" data-lang="javascript">' +
 				'<span class="jodit-code__keyword">let</span> a = <span class="jodit-code__number">1</span>;' +
 				'</code></pre></div></div>'
 		);
@@ -183,7 +183,53 @@ describe('unlockValue', () => {
 
 	it('leaves other elements alone', () => {
 		const html =
-			'<div class="note" contenteditable="false">x</div><div class="jodit-code-like" contenteditable="false"></div>';
+			'<div class="note" contenteditable="false">x</div><div class="jodit-code-like" contenteditable="false"></div>' +
+			'<pre class="other"><code class="language-js">a</code></pre>';
 		expect(unlockValue(html)).toBe(html);
+	});
+
+	it('turns the code and line numbers back into pre', () => {
+		const { html } = renderBlock('a\nb', 'plaintext', { lineNumbers: true });
+
+		expect(unlockValue(lockValue(html))).toBe(html);
+	});
+
+	it('replaces language-* with nohighlight in blocks saved before', () => {
+		expect(
+			unlockValue(
+				'<pre class="jodit-code__pre"><code class="jodit-code__code language-javascript" data-lang="javascript">a</code></pre>'
+			)
+		).toBe(
+			'<pre class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="javascript">a</code></pre>'
+		);
+	});
+});
+
+describe('lockValue', () => {
+	it('turns the code and line numbers of a block into div', () => {
+		const { html } = renderBlock('a\nb', 'plaintext', { lineNumbers: true });
+		const locked = lockValue(html);
+
+		expect(locked).not.toContain('<pre');
+		expect(bare(locked)).toContain('<div class="jodit-code__lines" aria-hidden="true">1\n2</div>');
+		expect(bare(locked)).toContain(
+			'<div class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="plaintext">a\nb</code></div>'
+		);
+		// The inline styles keep the white space of a pre
+		expect(locked).toMatch(/<div class="jodit-code__pre" style="[^"]*white-space:pre[;"]/);
+	});
+
+	it('leaves other pre alone', () => {
+		const html = '<pre class="language-js"><code>&lt;/pre&gt;</code></pre>';
+		expect(lockValue(html)).toBe(html);
+	});
+});
+
+describe('noHighlight', () => {
+	it('puts nohighlight in place of the language classes', () => {
+		expect(noHighlight('jodit-code__code language-js lang-ts')).toBe(
+			'jodit-code__code nohighlight'
+		);
+		expect(noHighlight('jodit-code__code nohighlight')).toBe('jodit-code__code nohighlight');
 	});
 });

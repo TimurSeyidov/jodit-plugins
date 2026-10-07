@@ -1,3 +1,5 @@
+import { build } from 'esbuild';
+
 import { expect, test } from './fixtures';
 import type { Locator, Page } from '@playwright/test';
 
@@ -61,7 +63,7 @@ test.describe('Code block', () => {
 
 		const html = await value(page);
 		expect(bare(html)).toMatch(
-			/^<p>Before<\/p><div class="jodit-code" data-lang="javascript"><div class="jodit-code__header"><span class="jodit-code__lang">JavaScript<\/span><\/div><div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code language-javascript" data-lang="javascript"><span class="jodit-code__keyword">class<\/span> <span class="jodit-code__title">Editor<\/span>/
+			/^<p>Before<\/p><div class="jodit-code" data-lang="javascript"><div class="jodit-code__header"><span class="jodit-code__lang">JavaScript<\/span><\/div><div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code nohighlight" data-lang="javascript"><span class="jodit-code__keyword">class<\/span> <span class="jodit-code__title">Editor<\/span>/
 		);
 		expect(html).toContain('style="color:var(--jodit-code-keyword,#cf222e)"');
 		expect(html).not.toContain('contenteditable');
@@ -72,6 +74,10 @@ test.describe('Code block', () => {
 			'contenteditable',
 			'false'
 		);
+
+		// No pre in the editor, for the tools that take every pre for their own
+		await expect(page.locator('.jodit-wysiwyg .jodit-code pre')).toHaveCount(0);
+		await expect(page.locator('.jodit-wysiwyg div.jodit-code__pre code')).toHaveCount(1);
 	});
 
 	test('shows the block in the preview tab', async ({ page }) => {
@@ -453,3 +459,121 @@ test.describe('Code block runtime', () => {
 		expect(download.suggestedFilename()).toBe('report.py');
 	});
 });
+
+/** highlight.js with its common languages as `window.hljs`, as a site would load it */
+async function highlightJs(): Promise<string> {
+	const result = await build({
+		stdin: {
+			contents: "import hljs from 'highlight.js/lib/common'; window.hljs = hljs;",
+			resolveDir: process.cwd()
+		},
+		bundle: true,
+		format: 'iife',
+		write: false
+	});
+	return result.outputFiles[0].text;
+}
+
+test.describe('Code block on a site', () => {
+	test('is left alone by highlight.js', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		const saved = await value(page);
+
+		const messages: string[] = [];
+		page.on('console', message => messages.push(message.text()));
+		await page.addScriptTag({ content: await highlightJs() });
+
+		const after = await page.evaluate(html => {
+			const site = document.createElement('div');
+			site.innerHTML = html;
+			document.body.append(site);
+			(window as unknown as { hljs: { highlightAll(): void } }).hljs.highlightAll();
+			return site.innerHTML;
+		}, saved);
+
+		expect(after).toBe(saved);
+		expect(messages).toEqual([]);
+	});
+
+	test('gets nohighlight when a block saved before is saved again', async ({ page }) => {
+		await openEditor(page, { buttons: BUTTONS });
+		await setValue(
+			page,
+			'<div class="jodit-code" data-lang="python"><div class="jodit-code__header"><span class="jodit-code__lang">Python</span></div>' +
+				'<div class="jodit-code__body"><pre class="jodit-code__pre"><code class="jodit-code__code language-python" data-lang="python">x = 1</code></pre></div></div>'
+		);
+
+		const html = await value(page);
+		expect(html).toContain('<code class="jodit-code__code nohighlight" data-lang="python">x = 1</code>');
+		expect(html).not.toContain('language-python');
+	});
+});
+
+test.describe('Code block with Jodit PRO', () => {
+	test('works next to the PRO code plugin when its button is not in the toolbar', async ({
+		page
+	}) => {
+		// A saved block in the textarea before the editor is made: the first
+		// value goes into the editor without setEditorValue
+		await openEditor(page, { buttons: BUTTONS });
+		await insertCode(page, SAMPLE);
+		const saved = await value(page);
+
+		await page.goto('/tests/e2e/page.html?plugins=code&jodit=pro');
+		await page.evaluate(html => {
+			(document.getElementById('editor') as HTMLTextAreaElement).value =
+				'<p>Before</p>' + html;
+			window.editor = window.Jodit.make('#editor', {
+				language: 'en',
+				toolbarAdaptive: false,
+				buttons: ['bold', 'code', 'source']
+			});
+		}, saved);
+		await expect(page.locator('.jodit-wysiwyg .jodit-code')).toHaveCount(1);
+		await page.waitForTimeout(1000);
+
+		// PRO does not repaint the block
+		expect(await value(page)).toBe('<p>Before</p>' + saved);
+		await expect(page.locator('.jodit-wysiwyg pre')).toHaveCount(0);
+
+		// Only this plugin answers a click and a double click on the block
+		await page.locator('.jodit-wysiwyg .jodit-code__body').hover();
+		await page.waitForTimeout(300);
+		await expect(page.locator('.jodit-ui-code-tuner__anchor')).toHaveCount(0);
+
+		await page.locator('.jodit-wysiwyg .jodit-code__body').dblclick();
+		await expect(page.locator('.jodit-dialog_active_true')).toHaveCount(1);
+		await expect(dialog(page)).toContainText('Edit code');
+		await footerButton(page, 'Cancel').click();
+
+		// Set as a value too
+		await setValue(page, '<p>Again</p>' + saved);
+		await page.waitForTimeout(500);
+		expect(await value(page)).toBe('<p>Again</p>' + saved);
+	});
+
+	test('turns itself off when the PRO code button is in the toolbar', async ({
+		page
+	}) => {
+		const warnings: string[] = [];
+		page.on('console', message => {
+			if (message.type() === 'warning') {
+				warnings.push(message.text());
+			}
+		});
+
+		await openEditor(
+			page,
+			{ buttons: ['bold', 'code', 'pasteCode'] },
+			{ plugins: ['code'], pro: true }
+		);
+
+		await expect(page.locator('.jodit-toolbar-button_paste-code, .jodit-toolbar-button_pasteCode')).toHaveCount(1);
+		await expect(toolbarButton(page, 'code')).toBeDisabled();
+		expect(warnings.filter(text => text.startsWith('jodit-plugin-code:'))).toEqual([
+			'jodit-plugin-code: the "pasteCode" button of Jodit PRO is in the toolbar, so the code plugin is off in this editor'
+		]);
+	});
+});
+

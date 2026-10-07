@@ -133,7 +133,8 @@ function styleTokens(html: string): string {
 
 /**
  * HTML of a code block: a header with the language, optional line numbers and the highlighted code.
- * Every part has a `jodit-code__*` class and inline styles, so the block looks right without any CSS on the site.
+ * Every part has a `jodit-code__*` class and inline styles, so the block looks right without any CSS on the site;
+ * `<code>` has the `nohighlight` class and no `language-*` class, so highlight.js or Prism on the site skip it.
  */
 export function renderBlock(
 	code: string,
@@ -169,7 +170,8 @@ export function renderBlock(
 		`<div class="jodit-code__body" style="${STYLES.body}">` +
 		gutter +
 		`<pre class="jodit-code__pre" style="${STYLES.pre};tab-size:${tabSize}">` +
-		`<code class="jodit-code__code language-${lang}" data-lang="${lang}" style="${STYLES.code}">` +
+		// No `language-*` class: the highlighters of a site leave the block alone
+		`<code class="jodit-code__code nohighlight" data-lang="${lang}" style="${STYLES.code}">` +
 		styleTokens(result.html) +
 		'</code></pre></div></div>';
 
