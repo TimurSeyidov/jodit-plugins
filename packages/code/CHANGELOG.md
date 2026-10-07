@@ -4,6 +4,8 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-07
+
 ### Added
 
 - Language button in the toolbar of a block: choosing another language highlights the code again and keeps the other settings of the block.
@@ -25,5 +27,6 @@ All notable changes to `jodit-plugin-code` are listed here. The format follows [
 - English, German and Russian.
 - ES module for bundlers, and browser builds for ES2015, ES2018 and ES2021 with highlight.js included, for a `<script>` tag or `extraPlugins`.
 
-[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.0.0...HEAD
+[Unreleased]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.1.0...HEAD
+[1.1.0]: https://github.com/TimurSeyidov/jodit-plugins/compare/code-v1.0.0...code-v1.1.0
 [1.0.0]: https://github.com/TimurSeyidov/jodit-plugins/releases/tag/code-v1.0.0

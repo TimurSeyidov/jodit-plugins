@@ -1,6 +1,6 @@
 {
 	"name": "jodit-plugin-code",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Jodit editor plugin that inserts code blocks with syntax highlighting: language choice, live preview, line numbers, inline styles with CSS variables, and a copy button runtime for the site",
 	"keywords": [
 		"jodit",
