@@ -1,0 +1,556 @@
+{
+	"posts": [
+		{
+			"id": 1,
+			"title": "His mother had always taught him",
+			"body": "His mother had always taught him not to ever think of himself as better than others. He'd tried to live by this motto. He never looked down on those who were less fortunate or who had less money than him. But the stupidity of the group of people he was talking to made him change his mind.",
+			"tags": [
+				"history",
+				"american",
+				"crime"
+			],
+			"reactions": {
+				"likes": 192,
+				"dislikes": 25
+			},
+			"views": 305
+		},
+		{
+			"id": 2,
+			"title": "He was an expert but not in a discipline",
+			"body": "He was an expert but not in a discipline that anyone could fully appreciate. He knew how to hold the cone just right so that the soft server ice-cream fell into it at the precise angle to form a perfect cone each and every time. It had taken years to perfect and he could now do it without even putting any thought behind it.",
+			"tags": [
+				"french",
+				"fiction",
+				"english"
+			],
+			"reactions": {
+				"likes": 859,
+				"dislikes": 32
+			},
+			"views": 4884
+		},
+		{
+			"id": 3,
+			"title": "Dave watched as the forest burned up on the hill.",
+			"body": "Dave watched as the forest burned up on the hill, only a few miles from her house. The car had been hastily packed and Marta was inside trying to round up the last of the pets. Dave went through his mental list of the most important papers and documents that they couldn't leave behind. He scolded himself for not having prepared these better in advance and hoped that he had remembered everything that was needed. He continued to wait for Marta to appear with the pets, but she still was nowhere to be seen.",
+			"tags": [
+				"magical",
+				"history",
+				"french"
+			],
+			"reactions": {
+				"likes": 1448,
+				"dislikes": 39
+			},
+			"views": 4152
+		}
+	],
+	"quotes": [
+		{
+			"id": 1,
+			"quote": "Your heart is the size of an ocean. Go find yourself in its hidden depths.",
+			"author": "Rumi"
+		},
+		{
+			"id": 2,
+			"quote": "The Bay of Bengal is hit frequently by cyclones. The months of November and May, in particular, are dangerous in this regard.",
+			"author": "Abdul Kalam"
+		},
+		{
+			"id": 3,
+			"quote": "Thinking is the capital, Enterprise is the way, Hard Work is the solution.",
+			"author": "Abdul Kalam"
+		}
+	],
+	"comments": [
+		{
+			"id": 1,
+			"body": "This is some awesome thinking!",
+			"likes": 3,
+			"user": {
+				"id": 105,
+				"username": "emmac",
+				"fullName": "Emma Wilson"
+			}
+		},
+		{
+			"id": 2,
+			"body": "What terrific math skills you're showing!",
+			"likes": 4,
+			"user": {
+				"id": 183,
+				"username": "cameronp",
+				"fullName": "Cameron Perez"
+			}
+		},
+		{
+			"id": 3,
+			"body": "You are an amazing writer!",
+			"likes": 2,
+			"user": {
+				"id": 1,
+				"username": "emilys",
+				"fullName": "Emily Johnson"
+			}
+		}
+	],
+	"todos": [
+		{
+			"id": 1,
+			"todo": "Do something nice for someone you care about",
+			"completed": false
+		},
+		{
+			"id": 2,
+			"todo": "Memorize a poem",
+			"completed": true
+		},
+		{
+			"id": 3,
+			"todo": "Watch a classic movie",
+			"completed": true
+		}
+	],
+	"users": [
+		{
+			"id": 1,
+			"firstName": "Emily",
+			"lastName": "Johnson",
+			"maidenName": "Smith",
+			"age": 29,
+			"gender": "female",
+			"email": "emily.johnson@x.dummyjson.com",
+			"phone": "+81 965-431-3024",
+			"username": "emilys",
+			"birthDate": "1996-5-30",
+			"image": "https://dummyjson.com/icon/emilys/128",
+			"bloodGroup": "O-",
+			"height": 193.24,
+			"weight": 63.16,
+			"eyeColor": "Green",
+			"hair": {
+				"color": "Brown",
+				"type": "Curly"
+			},
+			"address": {
+				"address": "626 Main Street",
+				"city": "Phoenix",
+				"state": "Mississippi",
+				"stateCode": "MS",
+				"postalCode": "29112",
+				"coordinates": {
+					"lat": -77.16213,
+					"lng": -92.084824
+				},
+				"country": "United States"
+			},
+			"university": "University of Wisconsin--Madison",
+			"company": {
+				"department": "Engineering",
+				"name": "Dooley, Kozey and Cronin",
+				"title": "Sales Manager",
+				"address": {
+					"address": "263 Tenth Street",
+					"city": "San Francisco",
+					"state": "Wisconsin",
+					"stateCode": "WI",
+					"postalCode": "37657",
+					"coordinates": {
+						"lat": 71.814525,
+						"lng": -161.150263
+					},
+					"country": "United States"
+				}
+			},
+			"role": "admin"
+		},
+		{
+			"id": 2,
+			"firstName": "Michael",
+			"lastName": "Williams",
+			"maidenName": "",
+			"age": 36,
+			"gender": "male",
+			"email": "michael.williams@x.dummyjson.com",
+			"phone": "+49 258-627-6644",
+			"username": "michaelw",
+			"birthDate": "1989-8-10",
+			"image": "https://dummyjson.com/icon/michaelw/128",
+			"bloodGroup": "B+",
+			"height": 186.22,
+			"weight": 76.32,
+			"eyeColor": "Red",
+			"hair": {
+				"color": "Green",
+				"type": "Straight"
+			},
+			"address": {
+				"address": "385 Fifth Street",
+				"city": "Houston",
+				"state": "Alabama",
+				"stateCode": "AL",
+				"postalCode": "38807",
+				"coordinates": {
+					"lat": 22.815468,
+					"lng": 115.608581
+				},
+				"country": "United States"
+			},
+			"university": "Ohio State University",
+			"company": {
+				"department": "Support",
+				"name": "Spinka - Dickinson",
+				"title": "Support Specialist",
+				"address": {
+					"address": "395 Main Street",
+					"city": "Los Angeles",
+					"state": "New Hampshire",
+					"stateCode": "NH",
+					"postalCode": "73442",
+					"coordinates": {
+						"lat": 79.098326,
+						"lng": -119.624845
+					},
+					"country": "United States"
+				}
+			},
+			"role": "admin"
+		},
+		{
+			"id": 3,
+			"firstName": "Sophia",
+			"lastName": "Brown",
+			"maidenName": "",
+			"age": 43,
+			"gender": "female",
+			"email": "sophia.brown@x.dummyjson.com",
+			"phone": "+81 210-652-2785",
+			"username": "sophiab",
+			"birthDate": "1982-11-6",
+			"image": "https://dummyjson.com/icon/sophiab/128",
+			"bloodGroup": "O-",
+			"height": 177.72,
+			"weight": 52.6,
+			"eyeColor": "Hazel",
+			"hair": {
+				"color": "White",
+				"type": "Wavy"
+			},
+			"address": {
+				"address": "1642 Ninth Street",
+				"city": "Washington",
+				"state": "Alabama",
+				"stateCode": "AL",
+				"postalCode": "32822",
+				"coordinates": {
+					"lat": 45.289366,
+					"lng": 46.832664
+				},
+				"country": "United States"
+			},
+			"university": "Pepperdine University",
+			"company": {
+				"department": "Research and Development",
+				"name": "Schiller - Zieme",
+				"title": "Accountant",
+				"address": {
+					"address": "1896 Washington Street",
+					"city": "Dallas",
+					"state": "Nevada",
+					"stateCode": "NV",
+					"postalCode": "88511",
+					"coordinates": {
+						"lat": 20.086743,
+						"lng": -34.577107
+					},
+					"country": "United States"
+				}
+			},
+			"role": "admin"
+		}
+	],
+	"products": [
+		{
+			"id": 1,
+			"title": "Essence Mascara Lash Princess",
+			"description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
+			"category": "beauty",
+			"brand": "Essence",
+			"price": 9.99,
+			"discountPercentage": 10.48,
+			"rating": 2.56,
+			"stock": 99,
+			"availabilityStatus": "In Stock",
+			"sku": "BEA-ESS-ESS-001",
+			"weight": 4,
+			"dimensions": {
+				"width": 15.14,
+				"height": 13.08,
+				"depth": 22.99
+			},
+			"warrantyInformation": "1 week warranty",
+			"shippingInformation": "Ships in 3-5 business days",
+			"returnPolicy": "No return policy",
+			"minimumOrderQuantity": 48,
+			"tags": [
+				"beauty",
+				"mascara"
+			],
+			"images": [
+				"https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
+			],
+			"thumbnail": "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp",
+			"reviews": [
+				{
+					"rating": 3,
+					"comment": "Would not recommend!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Eleanor Collins",
+					"reviewerEmail": "eleanor.collins@x.dummyjson.com"
+				},
+				{
+					"rating": 4,
+					"comment": "Very satisfied!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Lucas Gordon",
+					"reviewerEmail": "lucas.gordon@x.dummyjson.com"
+				},
+				{
+					"rating": 5,
+					"comment": "Highly impressed!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Eleanor Collins",
+					"reviewerEmail": "eleanor.collins@x.dummyjson.com"
+				}
+			]
+		},
+		{
+			"id": 2,
+			"title": "Eyeshadow Palette with Mirror",
+			"description": "The Eyeshadow Palette with Mirror offers a versatile range of eyeshadow shades for creating stunning eye looks. With a built-in mirror, it's convenient for on-the-go makeup application.",
+			"category": "beauty",
+			"brand": "Glamour Beauty",
+			"price": 19.99,
+			"discountPercentage": 18.19,
+			"rating": 2.86,
+			"stock": 34,
+			"availabilityStatus": "In Stock",
+			"sku": "BEA-GLA-EYE-002",
+			"weight": 9,
+			"dimensions": {
+				"width": 9.26,
+				"height": 22.47,
+				"depth": 27.67
+			},
+			"warrantyInformation": "1 year warranty",
+			"shippingInformation": "Ships in 2 weeks",
+			"returnPolicy": "7 days return policy",
+			"minimumOrderQuantity": 20,
+			"tags": [
+				"beauty",
+				"eyeshadow"
+			],
+			"images": [
+				"https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/1.webp"
+			],
+			"thumbnail": "https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp",
+			"reviews": [
+				{
+					"rating": 5,
+					"comment": "Great product!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Savannah Gomez",
+					"reviewerEmail": "savannah.gomez@x.dummyjson.com"
+				},
+				{
+					"rating": 4,
+					"comment": "Awesome product!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Christian Perez",
+					"reviewerEmail": "christian.perez@x.dummyjson.com"
+				},
+				{
+					"rating": 1,
+					"comment": "Poor quality!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Nicholas Bailey",
+					"reviewerEmail": "nicholas.bailey@x.dummyjson.com"
+				}
+			]
+		},
+		{
+			"id": 16,
+			"title": "Apple",
+			"description": "Fresh and crisp apples, perfect for snacking or incorporating into various recipes.",
+			"category": "groceries",
+			"price": 1.99,
+			"discountPercentage": 12.62,
+			"rating": 4.19,
+			"stock": 8,
+			"availabilityStatus": "In Stock",
+			"sku": "GRO-BRD-APP-016",
+			"weight": 9,
+			"dimensions": {
+				"width": 13.66,
+				"height": 11.01,
+				"depth": 9.73
+			},
+			"warrantyInformation": "3 year warranty",
+			"shippingInformation": "Ships in 2 weeks",
+			"returnPolicy": "90 days return policy",
+			"minimumOrderQuantity": 7,
+			"tags": [
+				"fruits"
+			],
+			"images": [
+				"https://cdn.dummyjson.com/product-images/groceries/apple/1.webp"
+			],
+			"thumbnail": "https://cdn.dummyjson.com/product-images/groceries/apple/thumbnail.webp",
+			"reviews": [
+				{
+					"rating": 5,
+					"comment": "Very satisfied!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Sophia Brown",
+					"reviewerEmail": "sophia.brown@x.dummyjson.com"
+				},
+				{
+					"rating": 1,
+					"comment": "Very dissatisfied!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "Scarlett Bowman",
+					"reviewerEmail": "scarlett.bowman@x.dummyjson.com"
+				},
+				{
+					"rating": 3,
+					"comment": "Very unhappy with my purchase!",
+					"date": "2025-04-30T09:41:02.053Z",
+					"reviewerName": "William Gonzalez",
+					"reviewerEmail": "william.gonzalez@x.dummyjson.com"
+				}
+			]
+		}
+	],
+	"recipes": [
+		{
+			"id": 1,
+			"name": "Classic Margherita Pizza",
+			"image": "https://cdn.dummyjson.com/recipe-images/1.webp",
+			"ingredients": [
+				"Pizza dough",
+				"Tomato sauce",
+				"Fresh mozzarella cheese",
+				"Fresh basil leaves",
+				"Olive oil",
+				"Salt and pepper to taste"
+			],
+			"instructions": [
+				"Preheat the oven to 475°F (245°C).",
+				"Roll out the pizza dough and spread tomato sauce evenly.",
+				"Top with slices of fresh mozzarella and fresh basil leaves.",
+				"Drizzle with olive oil and season with salt and pepper.",
+				"Bake in the preheated oven for 12-15 minutes or until the crust is golden brown.",
+				"Slice and serve hot."
+			],
+			"prepTimeMinutes": 20,
+			"cookTimeMinutes": 15,
+			"servings": 4,
+			"difficulty": "Easy",
+			"cuisine": "Italian",
+			"caloriesPerServing": 300,
+			"rating": 4.6,
+			"reviewCount": 98,
+			"tags": [
+				"Pizza",
+				"Italian"
+			],
+			"mealType": [
+				"Dinner"
+			]
+		},
+		{
+			"id": 2,
+			"name": "Vegetarian Stir-Fry",
+			"image": "https://cdn.dummyjson.com/recipe-images/2.webp",
+			"ingredients": [
+				"Tofu, cubed",
+				"Broccoli florets",
+				"Carrots, sliced",
+				"Bell peppers, sliced",
+				"Soy sauce",
+				"Ginger, minced",
+				"Garlic, minced",
+				"Sesame oil",
+				"Cooked rice for serving"
+			],
+			"instructions": [
+				"In a wok, heat sesame oil over medium-high heat.",
+				"Add minced ginger and garlic, sauté until fragrant.",
+				"Add cubed tofu and stir-fry until golden brown.",
+				"Add broccoli, carrots, and bell peppers. Cook until vegetables are tender-crisp.",
+				"Pour soy sauce over the stir-fry and toss to combine.",
+				"Serve over cooked rice."
+			],
+			"prepTimeMinutes": 15,
+			"cookTimeMinutes": 20,
+			"servings": 3,
+			"difficulty": "Medium",
+			"cuisine": "Asian",
+			"caloriesPerServing": 250,
+			"rating": 4.7,
+			"reviewCount": 26,
+			"tags": [
+				"Vegetarian",
+				"Stir-fry",
+				"Asian"
+			],
+			"mealType": [
+				"Lunch"
+			]
+		},
+		{
+			"id": 3,
+			"name": "Chocolate Chip Cookies",
+			"image": "https://cdn.dummyjson.com/recipe-images/3.webp",
+			"ingredients": [
+				"All-purpose flour",
+				"Butter, softened",
+				"Brown sugar",
+				"White sugar",
+				"Eggs",
+				"Vanilla extract",
+				"Baking soda",
+				"Salt",
+				"Chocolate chips"
+			],
+			"instructions": [
+				"Preheat the oven to 350°F (175°C).",
+				"In a bowl, cream together softened butter, brown sugar, and white sugar.",
+				"Beat in eggs one at a time, then stir in vanilla extract.",
+				"Combine flour, baking soda, and salt. Gradually add to the wet ingredients.",
+				"Fold in chocolate chips.",
+				"Drop rounded tablespoons of dough onto ungreased baking sheets.",
+				"Bake for 10-12 minutes or until edges are golden brown.",
+				"Allow cookies to cool on the baking sheet for a few minutes before transferring to a wire rack."
+			],
+			"prepTimeMinutes": 15,
+			"cookTimeMinutes": 10,
+			"servings": 24,
+			"difficulty": "Easy",
+			"cuisine": "American",
+			"caloriesPerServing": 150,
+			"rating": 4.9,
+			"reviewCount": 13,
+			"tags": [
+				"Cookies",
+				"Dessert",
+				"Baking"
+			],
+			"mealType": [
+				"Snack",
+				"Dessert"
+			]
+		}
+	]
+}
