@@ -1,0 +1,62 @@
+{
+	"name": "jodit-plugin-datagen",
+	"version": "1.0.0",
+	"description": "Jodit editor plugin that inserts generated content — posts, quotes, users, products, recipes, tables and images from DummyJSON — through ready layouts or your own templates",
+	"keywords": [
+		"jodit",
+		"jodit-plugin",
+		"dummy data",
+		"fake data",
+		"placeholder",
+		"lorem ipsum",
+		"dummyjson",
+		"template",
+		"generator",
+		"wysiwyg",
+		"editor"
+	],
+	"homepage": "https://timurseyidov.github.io/jodit-plugins/plugins/datagen/",
+	"bugs": {
+		"url": "https://github.com/TimurSeyidov/jodit-plugins/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TimurSeyidov/jodit-plugins.git",
+		"directory": "packages/datagen"
+	},
+	"author": "Timur Seiidov",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./browser": "./dist/es2021/plugins/datagen/datagen.min.js",
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist/",
+		"CHANGELOG.md"
+	],
+	"scripts": {
+		"prepublishOnly": "node ../../tools/build.mjs datagen"
+	},
+	"sideEffects": true,
+	"jsdelivr": "./dist/es2021/plugins/datagen/datagen.min.js",
+	"unpkg": "./dist/es2021/plugins/datagen/datagen.min.js",
+	"peerDependencies": {
+		"jodit": "^4.0.0"
+	},
+	"docs": {
+		"order": [
+			"installation.md",
+			"options.md",
+			"templates.md",
+			"types.md"
+		]
+	}
+}
