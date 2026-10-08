@@ -351,7 +351,13 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 			countInput.value = String(count);
 			countHint.textContent = t('1 to %s', max);
 
-			const result = await generate(type, { ...options, count, image });
+			// Not a spread: Jodit keeps the options of the editor on the prototype of its own
+			const result = await generate(type, {
+				baseUrl: options.baseUrl,
+				timeout: options.timeout,
+				count,
+				image
+			});
 
 			if (id !== request) {
 				return;

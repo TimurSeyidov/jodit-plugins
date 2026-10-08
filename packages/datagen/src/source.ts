@@ -114,7 +114,9 @@ export async function loadPool(
 
 	const loaded = await records;
 
-	return collection.toItems ? loaded.flatMap(collection.toItems) : loaded;
+	const { toItems } = collection;
+
+	return toItems ? ([] as DatagenRecord[]).concat(...loaded.map(record => toItems(record))) : loaded;
 }
 
 /** `count` different items of `pool` in random order; all of them when there are fewer */

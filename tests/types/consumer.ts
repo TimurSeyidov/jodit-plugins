@@ -13,6 +13,15 @@ import {
 } from 'jodit-plugin-mailto';
 import { registerQrCode, type QrCodeOptions } from 'jodit-plugin-qrcode';
 import {
+	checkTemplate,
+	generate,
+	registerDatagen,
+	render,
+	TYPES,
+	type DatagenOptions,
+	type DatagenTemplate
+} from 'jodit-plugin-datagen';
+import {
 	registerShortlink,
 	shorten,
 	ShortlinkError,
@@ -22,14 +31,25 @@ import {
 registerQrCode(Jodit);
 registerMailto(Jodit);
 registerShortlink(Jodit);
+registerDatagen(Jodit);
 
 // The plugins add their options to the options of Jodit.make()
 Jodit.make('#editor', {
 	code: { lineNumbers: true, languages: ['python', 'sql'], indent: '  ' },
 	qrcode: { size: 300, format: 'svg', errorCorrectionLevel: 'H' },
 	mailto: { fields: { bcc: false, body: 'main' }, required: { subject: true } },
-	shortlink: { service: 'clck', timeout: 5000 }
+	shortlink: { service: 'clck', timeout: 5000 },
+	datagen: {
+		types: { posts: false },
+		maxCount: 50,
+		layouts: {
+			cards: { type: 'users', title: 'Cards', before: '', item: '<p>{{fullName}}</p>', after: '' }
+		}
+	}
 });
+
+// @ts-expect-error: unknown type of data
+Jodit.make('#editor', { datagen: { types: { planets: false } } });
 
 // A function as the service
 Jodit.make('#editor', {
@@ -82,3 +102,10 @@ export { registerLanguage };
 
 const shortlink: ShortlinkOptions = Jodit.defaultOptions.shortlink;
 export const short: Promise<string> = shorten('https://example.com/', shortlink);
+
+const datagen: DatagenOptions = Jodit.defaultOptions.datagen;
+const template: DatagenTemplate = { before: '<ul>', item: '<li>{{title}}</li>', after: '</ul>' };
+export const problems: number = checkTemplate(template, TYPES.products).length;
+export const html: Promise<string> = generate('products', { ...datagen, count: 3 }).then(data =>
+	render(template, data)
+);

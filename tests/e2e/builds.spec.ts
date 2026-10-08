@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-import { insertBoth, openEditor, toolbarButton } from './helpers';
+import { insertBoth, openEditor, toolbarButton, value } from './helpers';
 
 test.describe('Builds', () => {
 	for (const build of ['es2015', 'es2018', 'es2021']) {
@@ -26,6 +26,30 @@ test.describe('Builds', () => {
 			await openEditor(page, { buttons: ['link'] }, { build, plugins: ['shortlink'] });
 			await toolbarButton(page, 'link').click();
 			await expect(page.locator('.jodit-popup .jodit-shortlink-field button')).toBeVisible();
+			expect(errors).toEqual([]);
+		});
+	}
+
+	for (const build of ['es2015', 'es2018', 'es2021']) {
+		test(`${build}: the data generation plugin inserts data`, async ({ page }) => {
+			const errors: string[] = [];
+			page.on('pageerror', error => errors.push(error.message));
+			await page.route('https://dummyjson.com/**', route =>
+				route.fulfill({
+					json: { quotes: [{ id: 1, quote: 'Be brief.', author: 'Anon' }] },
+					headers: { 'access-control-allow-origin': '*' }
+				})
+			);
+
+			await openEditor(
+				page,
+				{ buttons: ['datagen'], datagen: { types: { posts: false } } },
+				{ build, plugins: ['datagen'] }
+			);
+			await toolbarButton(page, 'datagen').click();
+			await page.locator('.jodit-datagen-dialog .jodit-ui-button_insert:not([disabled])').click();
+
+			await expect.poll(() => value(page)).toContain('<p>Be brief.</p><p><cite>— Anon</cite></p>');
 			expect(errors).toEqual([]);
 		});
 	}

@@ -64,6 +64,7 @@ test.describe('ES module', () => {
 				mailto: Boolean(Jodit.plugins.get('mailto')),
 				code: Boolean(Jodit.plugins.get('code')),
 				shortlink: Boolean(Jodit.plugins.get('shortlink')),
+				datagen: Boolean(Jodit.plugins.get('datagen')),
 				sameLinkControl: Jodit.defaultOptions.controls.link === before
 			};
 		});
@@ -73,6 +74,7 @@ test.describe('ES module', () => {
 			mailto: true,
 			code: true,
 			shortlink: true,
+			datagen: true,
 			sameLinkControl: true
 		});
 	});

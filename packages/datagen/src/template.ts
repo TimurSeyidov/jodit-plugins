@@ -55,6 +55,18 @@ interface Placeholder {
 }
 
 const TOKEN = /\{\{([^{}]*)\}\}/g;
+
+/** Matches of the global `pattern` in `text`, like `String.prototype.matchAll` of ES2020 */
+function matches(text: string, pattern: RegExp): RegExpExecArray[] {
+	const found: RegExpExecArray[] = [];
+	const regexp = new RegExp(pattern.source, pattern.flags);
+
+	for (let match = regexp.exec(text); match; match = regexp.exec(text)) {
+		found.push(match);
+	}
+
+	return found;
+}
 const PATH = /^[A-Za-z_$][\w$]*(?:\.(?:[A-Za-z_$][\w$]*|\d+))*$/;
 
 /** Placeholders of `text`, and the syntax errors */
@@ -64,7 +76,7 @@ function parse(text: string, part: TemplatePart): { placeholders: Placeholder[];
 	let outside = '';
 	let last = 0;
 
-	for (const match of text.matchAll(TOKEN)) {
+	for (const match of matches(text, TOKEN)) {
 		const start = match.index ?? 0;
 		const end = start + match[0].length;
 		const [path, ...filters] = match[1].split('|');
@@ -215,7 +227,7 @@ export function checkTags(html: string): TemplateError[] {
 	const unclosed = (tags: string[]) =>
 		tags.filter(tag => !OPTIONAL_END.has(tag)).forEach(tag => report('tag-unclosed', tag));
 
-	const tags = html.replace(/<!--[\s\S]*?-->/g, '').matchAll(/<(\/?)([a-zA-Z][\w-]*)\b[^>]*?(\/?)>/g);
+	const tags = matches(html.replace(/<!--[\s\S]*?-->/g, ''), /<(\/?)([a-zA-Z][\w-]*)\b[^>]*?(\/?)>/g);
 
 	for (const [, closing, rawName, selfClosing] of tags) {
 		const name = rawName.toLowerCase();
@@ -252,10 +264,12 @@ function resolve(record: DatagenRecord, path: string[]): DatagenValue {
 		if (Array.isArray(value)) {
 			value = /^\d+$/.test(segment)
 				? value[Number(segment)]
-				: value.flatMap(item => {
-						const field = item && typeof item === 'object' && !Array.isArray(item) ? item[segment] : undefined;
-						return Array.isArray(field) ? field : [field];
-					});
+				: ([] as DatagenValue[]).concat(
+						...value.map(item => {
+							const field = item && typeof item === 'object' && !Array.isArray(item) ? item[segment] : undefined;
+							return Array.isArray(field) ? field : [field];
+						})
+					);
 		} else if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, segment)) {
 			value = value[segment];
 		} else {

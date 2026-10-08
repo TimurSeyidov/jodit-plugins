@@ -30,6 +30,11 @@ export function insertContent(editor: IJodit, html: string): void {
 
 	// Parsed in a document of its own: no script or image of the HTML runs or loads before it is in the editor
 	const parsed = new DOMParser().parseFromString(`<!DOCTYPE html><body>${html}`, 'text/html');
+
+	// The cleaning that Jodit does on every insertion, with the cleanHTML options of the editor: no event handlers,
+	// no javascript: links, the sanitizer of the site
+	editor.e.fire('safeHTML', parsed.body);
+
 	const nodes = Array.from(parsed.body.childNodes, node => editor.ed.importNode(node, true));
 
 	if (!nodes.length) {
