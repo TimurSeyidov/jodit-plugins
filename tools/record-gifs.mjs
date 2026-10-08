@@ -65,6 +65,38 @@ async function caretToEnd(page) {
 }
 
 const scenarios = {
+	async datagen(page, size) {
+		// Real data of dummyjson.com: the test fixtures have only three records of a type
+		await page.evaluate(() => {
+			window.editor.value = '<p>Our bestsellers this week:</p>';
+		});
+		await caretToEnd(page);
+		await pause(600);
+
+		const dialog = page.locator('.jodit-datagen-dialog .jodit-dialog__panel');
+		await click(page, page.locator('.jodit-toolbar-button_datagen button'));
+		await pause(1200);
+
+		// Products as cards, then as a table
+		await click(page, dialog.locator('select[name="type"]'));
+		await dialog.locator('select[name="type"]').selectOption('products');
+		await pause(1800);
+		await click(page, dialog.locator('select[name="layout"]'));
+		await dialog.locator('select[name="layout"]').selectOption('table');
+		await pause(1400);
+
+		// The template of the table, with a line after it
+		await click(page, dialog.locator('.jodit-tabs__button').nth(1));
+		await pause(1200);
+		await type(page, dialog.locator('textarea[name="after"]'), '<p><em>{{count}} products</em></p>');
+		await pause(1400);
+
+		await click(page, dialog.locator('.jodit-ui-button_insert'));
+		await pause(1000);
+		await page.mouse.move(size.width - 40, size.height - 30, { steps: 12 });
+		await pause(1800);
+	},
+
 	async shortlink(page) {
 		// The services answer from here: the recording does not depend on the network
 		const shorts = { 'da.gd': 'https://da.gd/Rk7sQ', 'clck.ru': 'https://clck.ru/3FpWq' };
@@ -258,6 +290,15 @@ const scenarios = {
 // Window size and editor options of each recording; the window is high enough
 // for the open dialog
 const SETUP = {
+	datagen: {
+		size: { width: 900, height: 720 },
+		plugins: ['datagen'],
+		options: {
+			height: 660,
+			buttons: ['bold', 'italic', '|', 'ul', 'ol', 'table', '|', 'datagen', '|', 'source'],
+			datagen: { remember: false }
+		}
+	},
 	code: {
 		size: { width: 800, height: 600 },
 		options: {

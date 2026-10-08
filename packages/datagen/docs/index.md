@@ -6,6 +6,8 @@
 
 `jodit-plugin-datagen` fills the editor with realistic sample content: posts, quotes, comments, to-do lists, people, products, reviews, recipes, an order with totals, and placeholder images. The data comes from [DummyJSON](https://dummyjson.com/), and the HTML from a ready layout or from your own template.
 
+![Inserting a table of products and changing its template](media/datagen.gif)
+
 - **Ten types of data**: posts, quotes, comments, to-dos, users, products, reviews, recipes, an order and placeholder images. See [Types of data](types.md) for every field.
 - **Ready layouts**: headings with paragraphs, lists, checklists, tables, cards, full recipes and more, two to four for each type.
 - **Your own template**: HTML before the items, for every item and after them, with placeholders like `{{title}}` and filters like `{{tags|ul}}`, highlighted as you type. See [Templates](templates.md).

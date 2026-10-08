@@ -10,6 +10,7 @@ Plugins for the [Jodit](https://xdsoft.net/jodit/) editor. Each plugin is a sepa
 | Plugin | Package | Version | Docs |
 | --- | --- | --- | --- |
 | Code block | [`jodit-plugin-code`](packages/code) | [![npm](https://img.shields.io/npm/v/jodit-plugin-code)](https://www.npmjs.com/package/jodit-plugin-code) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/code/) |
+| Data generation | [`jodit-plugin-datagen`](packages/datagen) | [![npm](https://img.shields.io/npm/v/jodit-plugin-datagen)](https://www.npmjs.com/package/jodit-plugin-datagen) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/datagen/) |
 | Email link | [`jodit-plugin-mailto`](packages/mailto) | [![npm](https://img.shields.io/npm/v/jodit-plugin-mailto)](https://www.npmjs.com/package/jodit-plugin-mailto) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/mailto/) |
 | QR code | [`jodit-plugin-qrcode`](packages/qrcode) | [![npm](https://img.shields.io/npm/v/jodit-plugin-qrcode)](https://www.npmjs.com/package/jodit-plugin-qrcode) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/qrcode/) |
 | Short links | [`jodit-plugin-shortlink`](packages/shortlink) | [![npm](https://img.shields.io/npm/v/jodit-plugin-shortlink)](https://www.npmjs.com/package/jodit-plugin-shortlink) | [See docs](https://timurseyidov.github.io/jodit-plugins/plugins/shortlink/) |
