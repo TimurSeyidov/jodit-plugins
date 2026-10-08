@@ -113,7 +113,9 @@ test.describe('Data generation', () => {
 		await open(page);
 		await openDialog(page);
 
+		await expect(dialog(page).locator('.jodit-datagen__about')).toContainText('Short stories with a title');
 		await field(page, 'type').selectOption('products');
+		await expect(dialog(page).locator('.jodit-datagen__about')).toContainText('Products with a description');
 		await expect(field(page, 'layout')).toHaveValue('cards');
 		await expect(preview(page).locator('h3')).toHaveCount(3);
 
@@ -155,10 +157,13 @@ test.describe('Data generation', () => {
 		await mockService(page);
 		await open(page);
 		await openDialog(page);
-		await tab(page, 'Template').click();
+		// "Fields of the type" opens the template
+		await dialog(page).locator('.jodit-datagen__link').click();
+		await expect(dialog(page).locator('.jodit-datagen__fields')).toBeVisible();
 
 		const item = field(page, 'item');
 		await expect(item).toHaveValue('<h2>{{title}}</h2><p>{{body}}</p>');
+		await expect(dialog(page).locator('.jodit-datagen__layer .jodit-datagen-hl__field').first()).toHaveText('title');
 
 		await item.fill('<li>{{titel}} — {{tags|lu}}</li>');
 		await field(page, 'before').fill('<ul>');
@@ -171,6 +176,11 @@ test.describe('Data generation', () => {
 			'<ul> is not closed'
 		]);
 		await expect(insertButton(page)).toBeDisabled();
+		// The template underlines them
+		await expect(dialog(page).locator('.jodit-datagen__layer mark.jodit-datagen-hl__error')).toHaveText([
+			'{{titel}}',
+			'{{tags|lu}}'
+		]);
 
 		// A problem selects its placeholder
 		await problems(page).first().click();

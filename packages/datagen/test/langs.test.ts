@@ -37,6 +37,7 @@ function allTexts(): string[] {
 
 	for (const type of Object.values(TYPES)) {
 		texts.add(type.title);
+		texts.add(type.description);
 		[...type.fields, ...(type.context ?? [])].forEach(field => texts.add(field.description));
 	}
 

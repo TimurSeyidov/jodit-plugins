@@ -12,6 +12,7 @@ export default {
 	'Choose other records': 'Выбрать другие записи',
 	'1 to %s': 'от 1 до %s',
 	'Text colour': 'Цвет текста',
+	'Fields of the type': 'Поля типа',
 	'Own template': 'Свой шаблон',
 	Before: 'До',
 	Item: 'Элемент',
@@ -86,6 +87,28 @@ export default {
 	Recipes: 'Рецепты',
 	Order: 'Заказ',
 	Images: 'Изображения',
+
+	// Descriptions of the types
+	'Short stories with a title, one paragraph of text, tags and reactions.':
+		'Короткие истории: заголовок, один абзац текста, теги и реакции.',
+	'Quotes of famous people with their authors.':
+		'Цитаты известных людей с авторами.',
+	'One-sentence comments with the name of the author and the likes.':
+		'Комментарии в одно предложение с именем автора и лайками.',
+	'Tasks that are done or not, for lists and checklists.':
+		'Задачи, выполненные и нет, — для списков и чек-листов.',
+	'People: name, age, email, phone, avatar, address, company and job. No private data is asked for.':
+		'Люди: имя, возраст, почта, телефон, аватар, адрес, компания и должность. Личные данные не запрашиваются.',
+	'Products with a description, price, discount, rating, brand, pictures and reviews. The pictures are links to cdn.dummyjson.com.':
+		'Товары с описанием, ценой, скидкой, рейтингом, брендом, картинками и отзывами. Картинки — ссылки на cdn.dummyjson.com.',
+	'Reviews of the products: rating, text, the name of the reviewer and the product.':
+		'Отзывы о товарах: оценка, текст, имя автора и товар.',
+	'Recipes with a picture, ingredients, steps, time, servings and calories. There are 50 of them.':
+		'Рецепты с картинкой, ингредиентами, шагами, временем, порциями и калориями. Всего их 50.',
+	'An order of random products, each with a quantity from 1 to 5, and its totals: for an invoice or a receipt.':
+		'Заказ из случайных товаров, каждый в количестве от 1 до 5, с итогами — для счёта или чека.',
+	'Placeholder images of the size, colours and text you set, as links to the data service.':
+		'Картинки-заглушки с заданными размером, цветами и текстом — ссылками на сервис данных.',
 
 	// Layouts
 	'Headings and paragraphs': 'Заголовки и абзацы',

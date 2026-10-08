@@ -12,6 +12,7 @@ export default {
 	'Choose other records': 'Andere Datensätze wählen',
 	'1 to %s': '1 bis %s',
 	'Text colour': 'Textfarbe',
+	'Fields of the type': 'Felder des Typs',
 	'Own template': 'Eigene Vorlage',
 	Before: 'Davor',
 	Item: 'Eintrag',
@@ -87,6 +88,28 @@ export default {
 	Recipes: 'Rezepte',
 	Order: 'Bestellung',
 	Images: 'Bilder',
+
+	// Descriptions of the types
+	'Short stories with a title, one paragraph of text, tags and reactions.':
+		'Kurze Geschichten mit Titel, einem Absatz Text, Tags und Reaktionen.',
+	'Quotes of famous people with their authors.':
+		'Zitate berühmter Menschen mit ihren Autoren.',
+	'One-sentence comments with the name of the author and the likes.':
+		'Kommentare aus einem Satz mit dem Namen des Autors und den Likes.',
+	'Tasks that are done or not, for lists and checklists.':
+		'Erledigte und offene Aufgaben, für Listen und Checklisten.',
+	'People: name, age, email, phone, avatar, address, company and job. No private data is asked for.':
+		'Personen: Name, Alter, E-Mail, Telefon, Avatar, Adresse, Firma und Position. Private Daten werden nicht abgefragt.',
+	'Products with a description, price, discount, rating, brand, pictures and reviews. The pictures are links to cdn.dummyjson.com.':
+		'Produkte mit Beschreibung, Preis, Rabatt, Bewertung, Marke, Bildern und Bewertungen. Die Bilder sind Links zu cdn.dummyjson.com.',
+	'Reviews of the products: rating, text, the name of the reviewer and the product.':
+		'Bewertungen der Produkte: Note, Text, Name des Bewertenden und das Produkt.',
+	'Recipes with a picture, ingredients, steps, time, servings and calories. There are 50 of them.':
+		'Rezepte mit Bild, Zutaten, Schritten, Zeit, Portionen und Kalorien. Es gibt 50 davon.',
+	'An order of random products, each with a quantity from 1 to 5, and its totals: for an invoice or a receipt.':
+		'Eine Bestellung zufälliger Produkte, jeweils mit einer Menge von 1 bis 5, und ihre Summen: für eine Rechnung oder einen Beleg.',
+	'Placeholder images of the size, colours and text you set, as links to the data service.':
+		'Platzhalterbilder in der gewählten Größe, mit Farben und Text, als Links zum Datendienst.',
 
 	// Layouts
 	'Headings and paragraphs': 'Überschriften und Absätze',

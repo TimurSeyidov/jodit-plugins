@@ -2,6 +2,8 @@ import type { Jodit as JoditType } from 'jodit';
 import type { IJodit, IUIButton, IUIElement, IUIInput, IUISelect } from 'jodit/types/types/index.js';
 
 import { helpHtml } from './help.js';
+import { highlight } from './highlight.js';
+import type { Mark } from './highlight.js';
 import { translate } from './i18n.js';
 import { defaultImageSettings } from './images.js';
 import type { DatagenImageSettings } from './images.js';
@@ -147,13 +149,45 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 
 	const imageRow = new UIBlock(editor, Object.values(imageInputs), { className: 'jodit-datagen__row' });
 
+	// What the chosen type is, and a way to its fields
+	const about = editor.c.div('jodit-datagen__about');
+	const aboutText = editor.c.span();
+	const aboutFields = editor.c.element('button', { type: 'button', className: 'jodit-datagen__link' });
+	aboutFields.textContent = `${t('Fields of the type')} →`;
+	editor.e.on(aboutFields, 'click', () => tabs.activate(1));
+	about.append(aboutText, ' ', aboutFields);
+
 	const dataTab = editor.c.div('jodit-datagen__data');
-	dataTab.append(mainRow.container, imageRow.container);
+	dataTab.append(mainRow.container, imageRow.container, about);
 
 	// Template
 
 	const areas = {} as Record<TemplatePart, IUIInput & { nativeInput: HTMLTextAreaElement }>;
+	const layers = {} as Record<TemplatePart, HTMLElement>;
+	const lastMarks: Partial<Record<TemplatePart, Mark[]>> = {};
+	const observers: ResizeObserver[] = [];
 	let focused: TemplatePart = 'item';
+
+	// The text area shows the caret and the selection; the layer under it shows the text with colours
+	const paint = (part: TemplatePart, marks: Mark[] = []): void => {
+		const area = areas[part].nativeInput;
+		const layer = layers[part];
+
+		lastMarks[part] = marks;
+		layer.innerHTML = highlight(area.value, marks);
+
+		// Colours for the background of the field: in the dark theme of Jodit it can stay light
+		const box = layer.parentElement;
+
+		if (box) {
+			box.classList.toggle(
+				'jodit-datagen__code-box_dark',
+				isDark(editor.ow.getComputedStyle(box).backgroundColor)
+			);
+		}
+		layer.style.width = area.clientWidth ? `${area.clientWidth}px` : '';
+		layer.scrollTop = area.scrollTop;
+	};
 	const parts = editor.c.div('jodit-datagen__parts');
 
 	for (const part of PARTS) {
@@ -163,13 +197,35 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 			size: part === 'item' ? 4 : 2,
 			resizable: false
 		});
-		area.nativeInput.spellcheck = false;
-		area.nativeInput.setAttribute('autocapitalize', 'off');
-		editor.e.on(area.nativeInput, 'focus', () => {
+		const native = area.nativeInput as HTMLTextAreaElement;
+		native.spellcheck = false;
+		native.setAttribute('autocapitalize', 'off');
+		native.classList.add('jodit-datagen__code');
+
+		const layer = editor.c.element('pre', { className: 'jodit-datagen__layer', 'aria-hidden': 'true' });
+		native.parentElement?.classList.add('jodit-datagen__code-box');
+		native.parentElement?.insertBefore(layer, native);
+
+		areas[part] = area as typeof areas[TemplatePart];
+		layers[part] = layer;
+
+		editor.e.on(native, 'focus', () => {
 			focused = part;
 		});
-		editor.e.on(area.nativeInput, 'input', () => onTemplateInput());
-		areas[part] = area as typeof areas[TemplatePart];
+		editor.e.on(native, 'input', () => {
+			paint(part);
+			onTemplateInput();
+		});
+		editor.e.on(native, 'scroll', () => {
+			layer.scrollTop = native.scrollTop;
+		});
+
+		// The text area gets its size when its tab is shown, and when it is resized
+		if (typeof ResizeObserver !== 'undefined') {
+			const observer = new ResizeObserver(() => paint(part, lastMarks[part]));
+			observer.observe(native);
+			observers.push(observer);
+		}
 		parts.appendChild(new UIBlock(editor, [area]).container);
 	}
 
@@ -186,10 +242,28 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 
 	const problems = editor.c.element('ul', { className: 'jodit-datagen__problems' });
 	const status = editor.c.div('jodit-datagen__status');
-	const preview = editor.c.element('iframe', { className: 'jodit-datagen__preview' }) as HTMLIFrameElement;
 	// Nothing of the template runs in the preview: no scripts, no event handlers, no forms
-	preview.setAttribute('sandbox', '');
-	preview.title = t('Preview');
+	const createPreview = (srcdoc: string): HTMLIFrameElement => {
+		const frame = editor.c.element('iframe', { className: 'jodit-datagen__preview' }) as HTMLIFrameElement;
+		frame.setAttribute('sandbox', '');
+		frame.title = t('Preview');
+		frame.srcdoc = srcdoc;
+		return frame;
+	};
+	let preview = createPreview(previewDocument(''));
+	let shown = '';
+
+	// A new frame for every change: Chrome can drop a new srcdoc while the frame still loads the previous one
+	const showPreview = (body: string): void => {
+		if (body === shown) {
+			return;
+		}
+
+		shown = body;
+		const frame = createPreview(previewDocument(body));
+		preview.replaceWith(frame);
+		preview = frame;
+	};
 	const notice = editor.c.div('jodit-datagen__notice');
 	notice.textContent = t('The inserted content is regular content: it cannot be generated again. Check the preview.');
 
@@ -227,6 +301,7 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 	const setTemplate = (value: DatagenTemplate): void => {
 		PARTS.forEach(part => {
 			areas[part].value = value[part];
+			paint(part);
 		});
 	};
 
@@ -325,8 +400,20 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 		const blocked = list.some(problem => !isWarning(problem));
 
 		showProblems(list);
+		PARTS.forEach(part =>
+			paint(
+				part,
+				list
+					.filter(problem => problem.part === part && problem.start !== undefined)
+					.map(problem => ({
+						start: problem.start ?? 0,
+						end: problem.end ?? 0,
+						warning: isWarning(problem)
+					}))
+			)
+		);
 		html = data && !blocked ? render(template(), data) : '';
-		preview.srcdoc = previewDocument(html);
+		showPreview(html);
 		submit.state.disabled = loading || !data || blocked;
 	};
 
@@ -397,6 +484,7 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 	const changeType = (): void => {
 		type = typeSelect.value as DatagenTypeName;
 		data = null;
+		aboutText.textContent = t(TYPES[type].description);
 		imageRow.container.style.display = type === 'images' ? '' : 'none';
 		fillLayouts();
 		fillFields();
@@ -444,6 +532,7 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 	});
 
 	editor.e.on(dialog, 'afterClose', () => {
+		observers.forEach(observer => observer.disconnect());
 		editor.s.restore();
 		dialog.destruct();
 	});
@@ -458,6 +547,13 @@ export function openDialog(Jodit: JoditStatic, editor: IJodit): void {
 		() => editor.e.fire(editor.ow, 'joditCloseDialog'),
 		(editor.o.showTooltipDelay ?? 200) + 100
 	);
+}
+
+/** `color` (`rgb(…)` or `rgba(…)`) is dark; a transparent one is not */
+export function isDark(color: string): boolean {
+	const [r, g, b, a = 1] = (color.match(/[\d.]+/g) ?? []).map(Number);
+
+	return a > 0 && r !== undefined && 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
 }
 
 /** Replaces the options of a select */

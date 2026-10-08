@@ -61,6 +61,9 @@ export interface DatagenType {
 	/** Name in the list of types, in English */
 	title: string;
 
+	/** What the records are, in English: the dialog shows it under the choice of the type */
+	description: string;
+
 	/** Fields of the Item template */
 	fields: DatagenField[];
 
@@ -100,6 +103,7 @@ const id: DatagenField = { path: 'id', description: 'Number of the record in the
 export const TYPES: Record<DatagenTypeName, DatagenType> = {
 	posts: {
 		title: 'Posts',
+		description: 'Short stories with a title, one paragraph of text, tags and reactions.',
 		collection: {
 			resource: 'posts',
 			select: ['title', 'body', 'tags', 'reactions', 'views']
@@ -117,6 +121,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	quotes: {
 		title: 'Quotes',
+		description: 'Quotes of famous people with their authors.',
 		collection: { resource: 'quotes', select: ['quote', 'author'] },
 		fields: [
 			id,
@@ -127,6 +132,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	comments: {
 		title: 'Comments',
+		description: 'One-sentence comments with the name of the author and the likes.',
 		collection: { resource: 'comments', select: ['body', 'likes', 'user'] },
 		fields: [
 			id,
@@ -139,6 +145,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	todos: {
 		title: 'To-dos',
+		description: 'Tasks that are done or not, for lists and checklists.',
 		collection: {
 			resource: 'todos',
 			select: ['todo', 'completed'],
@@ -154,6 +161,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	users: {
 		title: 'Users',
+		description: 'People: name, age, email, phone, avatar, address, company and job. No private data is asked for.',
 		collection: {
 			resource: 'users',
 			select: [
@@ -226,6 +234,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	products: {
 		title: 'Products',
+		description: 'Products with a description, price, discount, rating, brand, pictures and reviews. The pictures are links to cdn.dummyjson.com.',
 		collection: {
 			resource: 'products',
 			select: [
@@ -292,6 +301,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	reviews: {
 		title: 'Reviews',
+		description: 'Reviews of the products: rating, text, the name of the reviewer and the product.',
 		collection: {
 			resource: 'products',
 			select: ['title', 'thumbnail', 'reviews'],
@@ -320,6 +330,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	recipes: {
 		title: 'Recipes',
+		description: 'Recipes with a picture, ingredients, steps, time, servings and calories. There are 50 of them.',
 		collection: {
 			resource: 'recipes',
 			select: [
@@ -360,6 +371,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	order: {
 		title: 'Order',
+		description: 'An order of random products, each with a quantity from 1 to 5, and its totals: for an invoice or a receipt.',
 		collection: {
 			resource: 'products',
 			select: ['title', 'brand', 'price', 'thumbnail']
@@ -397,6 +409,7 @@ export const TYPES: Record<DatagenTypeName, DatagenType> = {
 
 	images: {
 		title: 'Images',
+		description: 'Placeholder images of the size, colours and text you set, as links to the data service.',
 		fields: [
 			{ path: 'url', description: 'URL of the image' },
 			{ path: 'width', description: 'Width, px' },

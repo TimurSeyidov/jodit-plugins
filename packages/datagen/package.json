@@ -56,7 +56,8 @@
 			"installation.md",
 			"options.md",
 			"templates.md",
-			"types.md"
+			"types.md",
+			"examples.md"
 		]
 	}
 }
